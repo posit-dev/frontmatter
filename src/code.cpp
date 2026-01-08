@@ -7,6 +7,13 @@ using namespace cpp11;
 const size_t MAX_FRONT_MATTER_SIZE = 1048576;  // 1 MB
 const size_t MAX_FRONT_MATTER_LINES = 10000;
 
+// PEP 723 delimiter lengths
+// Opening: "# /// script" (12 chars, need 13 to check for trailing content)
+const size_t PEP723_OPENING_LEN = 12;
+const size_t PEP723_OPENING_CHECK_LEN = 13;
+// Closing: "# ///" (5 chars)
+const size_t PEP723_CLOSING_LEN = 5;
+
 // Helper: Check if character is whitespace (space or tab)
 inline bool is_whitespace(char c) {
   return c == ' ' || c == '\t';
@@ -348,7 +355,7 @@ std::string trim_leading_comment_lines(const std::string& body, const char* pref
 // Helper: Check if line starts with PEP 723 opening delimiter
 bool is_pep723_opening(const char* str, size_t pos, size_t len) {
   // Must be exactly "# /// script" (# space /// space script)
-  if (pos + 13 > len) return false;
+  if (pos + PEP723_OPENING_CHECK_LEN > len) return false;
   if (str[pos] != '#') return false;
   if (str[pos + 1] != ' ') return false;
   if (str[pos + 2] != '/' || str[pos + 3] != '/' || str[pos + 4] != '/') return false;
@@ -356,7 +363,7 @@ bool is_pep723_opening(const char* str, size_t pos, size_t len) {
   if (str[pos + 6] != 's' || str[pos + 7] != 'c' || str[pos + 8] != 'r' || str[pos + 9] != 'i' || str[pos + 10] != 'p' || str[pos + 11] != 't') return false;
 
   // After "script", only whitespace until newline or EOF
-  size_t i = pos + 12;
+  size_t i = pos + PEP723_OPENING_LEN;
   while (i < len && is_whitespace(str[i])) {
     i++;
   }
@@ -366,13 +373,13 @@ bool is_pep723_opening(const char* str, size_t pos, size_t len) {
 // Helper: Check if line starts with PEP 723 closing delimiter
 bool is_pep723_closing(const char* str, size_t pos, size_t len) {
   // Must be exactly "# ///" (# space /// and nothing else)
-  if (pos + 5 > len) return false;
+  if (pos + PEP723_CLOSING_LEN > len) return false;
   if (str[pos] != '#') return false;
   if (str[pos + 1] != ' ') return false;
   if (str[pos + 2] != '/' || str[pos + 3] != '/' || str[pos + 4] != '/') return false;
 
   // After "///", only whitespace until newline or EOF
-  size_t i = pos + 5;
+  size_t i = pos + PEP723_CLOSING_LEN;
   while (i < len && is_whitespace(str[i])) {
     i++;
   }
@@ -402,8 +409,6 @@ list extract_pep723(const std::string& text) {
 
   // Find closing delimiter and validate all lines in between
   while (pos < len) {
-    bool at_line_start = true;
-
     // Check for closing delimiter
     if (is_pep723_closing(str, pos, len)) {
       // Found closing, extract content

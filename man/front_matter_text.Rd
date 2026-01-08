@@ -7,7 +7,9 @@
 front_matter_text(text, parsers = NULL)
 }
 \arguments{
-\item{text}{A character string containing the document text.}
+\item{text}{A character string or vector containing the document text. If a
+vector with multiple elements, they are joined with newlines (as from
+\code{readLines()}).}
 
 \item{parsers}{An optional list of parser functions created by
 \code{\link[=front_matter_parsers]{front_matter_parsers()}}. If \code{NULL}, default parsers are used.}

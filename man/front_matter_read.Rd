@@ -7,7 +7,9 @@
 front_matter_read(path, parsers = NULL)
 }
 \arguments{
-\item{path}{A character string specifying the path to a file.}
+\item{path}{A character string specifying the path to a file. The file is
+assumed to be UTF-8 encoded. A UTF-8 BOM (byte order mark) at the start
+of the file is automatically stripped if present.}
 
 \item{parsers}{An optional list of parser functions created by
 \code{\link[=front_matter_parsers]{front_matter_parsers()}}. If \code{NULL}, default parsers are used.}
@@ -17,7 +19,7 @@ A named list with two elements:
 \itemize{
 \item \code{data}: The parsed front matter as an R object, or \code{NULL} if no valid
 front matter was found.
-\item \code{body}: The document content after the front matter.
+\item \code{body}: The document content after the front matter (without BOM).
 }
 }
 \description{

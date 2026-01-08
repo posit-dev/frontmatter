@@ -90,7 +90,8 @@ test_that("empty front matter doesn't trigger limits", {
   text <- "---\n---\nBody"
   result <- front_matter_text(text)
 
-  # Empty YAML returns NULL but this is parser behavior, not a limit issue
-  expect_true(is.null(result$data) || !is.null(result$data))
+  # Empty YAML returns NULL from parser, but front matter was successfully extracted
+  # (not rejected due to limits). The key test is that body is "Body", not original text.
+  expect_null(result$data)
   expect_equal(result$body, "Body")
 })

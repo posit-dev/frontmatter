@@ -48,8 +48,18 @@ test_that("front_matter_text handles documents with only front matter", {
 })
 
 test_that("front_matter_text validates input", {
-  expect_error(front_matter_text(123), "must be a single string")
-  expect_error(front_matter_text(c("a", "b")), "must be a single string")
+  expect_error(front_matter_text(123), "must be a character vector")
+})
+
+test_that("front_matter_text accepts multi-element vectors", {
+  skip_if_not_installed("yaml12")
+
+  # Multi-element vectors are joined with newlines (as from readLines())
+  lines <- c("---", "title: Test", "---", "Body content")
+  result <- front_matter_text(lines)
+
+  expect_equal(result$data$title, "Test")
+  expect_equal(result$body, "Body content")
 })
 
 test_that("front_matter_text validates parsers argument", {

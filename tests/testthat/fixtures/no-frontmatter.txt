@@ -1,0 +1,3 @@
+This is a plain text file without any front matter.
+
+It has multiple lines but no YAML or TOML delimiters at the start.

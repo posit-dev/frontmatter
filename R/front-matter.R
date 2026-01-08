@@ -4,7 +4,9 @@
 #' is structured metadata at the beginning of a document, delimited by fences
 #' (`---` for YAML, `+++` for TOML).
 #'
-#' @param text A character string containing the document text.
+#' @param text A character string or vector containing the document text. If a
+#'   vector with multiple elements, they are joined with newlines (as from
+#'   `readLines()`).
 #' @param parsers An optional list of parser functions created by
 #'   [front_matter_parsers()]. If `NULL`, default parsers are used.
 #'
@@ -85,14 +87,16 @@ front_matter_text <- function(text, parsers = NULL) {
 #' Read a file and extract and parse YAML or TOML front matter. This is a
 #' convenience wrapper around [front_matter_text()] that handles file reading.
 #'
-#' @param path A character string specifying the path to a file.
+#' @param path A character string specifying the path to a file. The file is
+#'   assumed to be UTF-8 encoded. A UTF-8 BOM (byte order mark) at the start
+#'   of the file is automatically stripped if present.
 #' @param parsers An optional list of parser functions created by
 #'   [front_matter_parsers()]. If `NULL`, default parsers are used.
 #'
 #' @return A named list with two elements:
 #'   - `data`: The parsed front matter as an R object, or `NULL` if no valid
 #'     front matter was found.
-#'   - `body`: The document content after the front matter.
+#'   - `body`: The document content after the front matter (without BOM).
 #'
 #' @examples
 #' \dontrun{
@@ -116,6 +120,15 @@ front_matter_read <- function(path, parsers = NULL) {
   }
 
   raw_bytes <- readBin(path, "raw", n = file_size)
+
+  # Strip UTF-8 BOM (EF BB BF) if present
+  if (length(raw_bytes) >= 3 &&
+      raw_bytes[1] == as.raw(0xEF) &&
+      raw_bytes[2] == as.raw(0xBB) &&
+      raw_bytes[3] == as.raw(0xBF)) {
+    raw_bytes <- raw_bytes[-c(1:3)]
+  }
+
   text <- rawToChar(raw_bytes)
   Encoding(text) <- "UTF-8"
 

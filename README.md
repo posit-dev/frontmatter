@@ -124,10 +124,13 @@ parsers <- front_matter_parsers(yaml = identity)
 result <- front_matter_text(text, parsers = parsers)
 result$data  # Raw YAML string
 
-# Use custom YAML parser
-library(yaml)
+# Use a custom parser that adds metadata
 parsers <- front_matter_parsers(
-  yaml = function(x) yaml::yaml.load(x)
+  yaml = function(x) {
+    data <- yaml12::parse_yaml(x)
+    data$parsed_at <- Sys.time()
+    data
+  }
 )
 result <- front_matter_text(text, parsers = parsers)
 ```
@@ -173,7 +176,7 @@ The package uses C++11 for optimal performance:
 - Minimal string copying
 - Efficient fence detection and validation
 
-Typical parsing speed: 1000+ documents per second on modern hardware.
+Designed for high throughput processing of many documents.
 
 ## License
 

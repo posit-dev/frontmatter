@@ -21,9 +21,13 @@
 #' # Get raw YAML without parsing
 #' parsers <- front_matter_parsers(yaml = identity)
 #'
-#' # Use a custom YAML parser
+#' # Use a custom parser that adds metadata
 #' parsers <- front_matter_parsers(
-#'   yaml = function(x) yaml::yaml.load(x)
+#'   yaml = function(x) {
+#'     data <- yaml12::parse_yaml(x)
+#'     data$parsed_at <- Sys.time()
+#'     data
+#'   }
 #' )
 #'
 #' @export

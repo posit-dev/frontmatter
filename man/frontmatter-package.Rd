@@ -32,7 +32,7 @@ delimited by fences.
 \section{Performance}{
 
 Uses C++11 for fast, single-pass parsing with minimal memory overhead.
-Typical performance: 1000+ documents/second.
+Designed for high throughput processing of many documents.
 }
 
 \section{Security}{
