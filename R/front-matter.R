@@ -37,7 +37,7 @@
 #' tmpfile <- tempfile(fileext = ".md")
 #' writeLines(text, tmpfile)
 #'
-#' result <- read_front_matter(tmpfile)
+#' read_front_matter(tmpfile)
 #'
 #' @param text A character string or vector containing the document text. If a
 #'   vector with multiple elements, they are joined with newlines (as from

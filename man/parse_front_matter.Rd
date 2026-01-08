@@ -75,6 +75,6 @@ result <- parse_front_matter(
 tmpfile <- tempfile(fileext = ".md")
 writeLines(text, tmpfile)
 
-result <- read_front_matter(tmpfile)
+read_front_matter(tmpfile)
 
 }
