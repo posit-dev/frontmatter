@@ -5,7 +5,7 @@ test_that("large front matter is parsed correctly", {
   large_content <- paste(rep("x: value\n", 50000), collapse = "")
   text <- paste0("---\n", large_content, "---\nBody")
 
-  result <- front_matter_text(text)
+  result <- parse_front_matter(text)
 
   # Large front matter should be parsed successfully
 
@@ -20,7 +20,7 @@ test_that("front matter with many lines is parsed correctly", {
   lines <- paste(rep("x: value\n", 11000), collapse = "")
   text <- paste0("---\n", lines, "---\nBody")
 
-  result <- front_matter_text(text)
+  result <- parse_front_matter(text)
 
   # Should parse successfully
   expect_true(!is.null(result$data))
@@ -34,7 +34,7 @@ test_that("large comment-wrapped front matter is parsed correctly", {
   lines <- paste(rep("# x: value\n", 11000), collapse = "")
   text <- paste0("# ---\n", lines, "# ---\nBody")
 
-  result <- front_matter_text(text)
+  result <- parse_front_matter(text)
 
   expect_true(!is.null(result$data))
   expect_equal(result$body, "Body")
@@ -52,7 +52,7 @@ test_that("large PEP 723 block is parsed correctly", {
     "# ]\n# ///\nBody"
   )
 
-  result <- front_matter_text(text)
+  result <- parse_front_matter(text)
 
   expect_true(!is.null(result$data))
   expect_equal(result$body, "Body")
@@ -63,7 +63,7 @@ test_that("document without front matter handles large content", {
   lines <- paste(rep("Line of content\n", 20000), collapse = "")
   text <- lines
 
-  result <- front_matter_text(text)
+  result <- parse_front_matter(text)
 
   # No front matter found
   expect_null(result$data)
@@ -74,7 +74,7 @@ test_that("empty front matter is parsed correctly", {
   skip_if_not_installed("yaml12")
 
   text <- "---\n---\nBody"
-  result <- front_matter_text(text)
+  result <- parse_front_matter(text)
 
   # Empty YAML returns NULL from parser, but front matter was successfully extracted
   expect_null(result$data)

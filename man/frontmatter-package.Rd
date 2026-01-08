@@ -23,8 +23,8 @@ delimited by fences.
 \section{Main Functions}{
 
 \itemize{
-\item \code{\link[=front_matter_text]{front_matter_text()}}: Parse front matter from a string
-\item \code{\link[=front_matter_read]{front_matter_read()}}: Parse front matter from a file
+\item \code{\link[=parse_front_matter]{parse_front_matter()}}: Parse front matter from a string
+\item \code{\link[=read_front_matter]{read_front_matter()}}: Parse front matter from a file
 \item \code{\link[=front_matter_parsers]{front_matter_parsers()}}: Create custom parser configuration
 }
 }

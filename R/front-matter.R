@@ -24,7 +24,7 @@
 #' ---
 #' Document content here"
 #'
-#' result <- front_matter_text(text)
+#' result <- parse_front_matter(text)
 #' result$data$title  # "My Document"
 #' result$body        # "Document content here"
 #'
@@ -35,16 +35,16 @@
 #' +++
 #' Document content"
 #'
-#' result <- front_matter_text(text)
+#' result <- parse_front_matter(text)
 #'
 #' # Get raw YAML without parsing
-#' result <- front_matter_text(
+#' result <- parse_front_matter(
 #'   text,
 #'   parsers = front_matter_parsers(yaml = identity)
 #' )
 #'
 #' @export
-front_matter_text <- function(text, parsers = NULL) {
+parse_front_matter <- function(text, parsers = NULL) {
   check_character(text)
   if (length(text) > 1) {
     text <- paste0(text, collapse = "\n")
@@ -85,7 +85,7 @@ front_matter_text <- function(text, parsers = NULL) {
 #' Parse Front Matter from File
 #'
 #' Read a file and extract and parse YAML or TOML front matter. This is a
-#' convenience wrapper around [front_matter_text()] that handles file reading.
+#' convenience wrapper around [parse_front_matter()] that handles file reading.
 #'
 #' @param path A character string specifying the path to a file. The file is
 #'   assumed to be UTF-8 encoded. A UTF-8 BOM (byte order mark) at the start
@@ -101,13 +101,13 @@ front_matter_text <- function(text, parsers = NULL) {
 #' @examples
 #' \dontrun{
 #' # Parse front matter from a markdown file
-#' result <- front_matter_read("document.md")
+#' result <- read_front_matter("document.md")
 #' result$data$title
 #' result$body
 #' }
 #'
 #' @export
-front_matter_read <- function(path, parsers = NULL) {
+read_front_matter <- function(path, parsers = NULL) {
   check_string(path)
 
   if (!file.exists(path)) {
@@ -134,5 +134,5 @@ front_matter_read <- function(path, parsers = NULL) {
   text <- rawToChar(raw_bytes)
   Encoding(text) <- "UTF-8"
 
-  front_matter_text(text, parsers = parsers)
+  parse_front_matter(text, parsers = parsers)
 }

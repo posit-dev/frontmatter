@@ -38,7 +38,7 @@ tags:
 
 Document content starts here."
 
-result <- front_matter_text(text)
+result <- parse_front_matter(text)
 result$data$title    # "My Document"
 result$data$tags     # c("tutorial", "R")
 result$body          # "Document content starts here."
@@ -47,7 +47,7 @@ result$body          # "Document content starts here."
 ### Parse from File
 
 ```r
-result <- front_matter_read("document.md")
+result <- read_front_matter("document.md")
 ```
 
 ### TOML Front Matter
@@ -60,7 +60,7 @@ count = 42
 
 Content here"
 
-result <- front_matter_text(text)
+result <- parse_front_matter(text)
 result$data$title    # "My Document"
 result$data$count    # 42
 ```
@@ -79,7 +79,7 @@ text <- "# ---
 library(dplyr)
 # Analysis code..."
 
-result <- front_matter_text(text)
+result <- parse_front_matter(text)
 result$data$title    # "My Analysis"
 ```
 
@@ -92,7 +92,7 @@ text <- "#' ---
 #'
 #' Documentation here"
 
-result <- front_matter_text(text)
+result <- parse_front_matter(text)
 ```
 
 ### PEP 723 Python Metadata
@@ -107,7 +107,7 @@ text <- "# /// script
 
 import requests"
 
-result <- front_matter_text(text)
+result <- parse_front_matter(text)
 result$data$`requires-python`  # ">=3.11"
 ```
 
@@ -116,7 +116,7 @@ result$data$`requires-python`  # ">=3.11"
 ```r
 # Get raw YAML without parsing
 parsers <- front_matter_parsers(yaml = identity)
-result <- front_matter_text(text, parsers = parsers)
+result <- parse_front_matter(text, parsers = parsers)
 result$data  # Raw YAML string
 
 # Use a custom parser that adds metadata
@@ -127,7 +127,7 @@ parsers <- front_matter_parsers(
     data
   }
 )
-result <- front_matter_text(text, parsers = parsers)
+result <- parse_front_matter(text, parsers = parsers)
 ```
 
 ## Default Parsers
@@ -147,7 +147,7 @@ Invalid front matter returns `NULL` as data and the original content unchanged:
 
 ```r
 text <- "Not valid front matter"
-result <- front_matter_text(text)
+result <- parse_front_matter(text)
 result$data  # NULL
 result$body  # Original text
 ```

@@ -11,8 +11,8 @@
 #' * PEP 723 Python inline script metadata
 #'
 #' @section Main Functions:
-#' * [front_matter_text()]: Parse front matter from a string
-#' * [front_matter_read()]: Parse front matter from a file
+#' * [parse_front_matter()]: Parse front matter from a string
+#' * [read_front_matter()]: Parse front matter from a file
 #' * [front_matter_parsers()]: Create custom parser configuration
 #'
 #' @section Performance:

@@ -1,8 +1,8 @@
-test_that("front_matter_text parses YAML correctly", {
+test_that("parse_front_matter parses YAML correctly", {
   skip_if_not_installed("yaml12")
 
   text <- "---\ntitle: Test\ndate: 2024-01-01\n---\nBody content"
-  result <- front_matter_text(text)
+  result <- parse_front_matter(text)
 
   expect_true(!is.null(result$data))
   expect_equal(result$data$title, "Test")
@@ -10,11 +10,11 @@ test_that("front_matter_text parses YAML correctly", {
   expect_equal(result$body, "Body content")
 })
 
-test_that("front_matter_text parses TOML correctly", {
+test_that("parse_front_matter parses TOML correctly", {
   skip_if_not_installed("toml")
 
   text <- "+++\ntitle = \"Test\"\ncount = 42\n+++\nBody content"
-  result <- front_matter_text(text)
+  result <- parse_front_matter(text)
 
   expect_true(!is.null(result$data))
   expect_equal(result$data$title, "Test")
@@ -22,61 +22,61 @@ test_that("front_matter_text parses TOML correctly", {
   expect_equal(result$body, "Body content")
 })
 
-test_that("front_matter_text returns NULL for no front matter", {
+test_that("parse_front_matter returns NULL for no front matter", {
   text <- "Just content\nNo front matter"
-  result <- front_matter_text(text)
+  result <- parse_front_matter(text)
 
   expect_null(result$data)
   expect_equal(result$body, text)
 })
 
-test_that("front_matter_text handles empty documents", {
-  result <- front_matter_text("")
+test_that("parse_front_matter handles empty documents", {
+  result <- parse_front_matter("")
 
   expect_null(result$data)
   expect_equal(result$body, "")
 })
 
-test_that("front_matter_text handles documents with only front matter", {
+test_that("parse_front_matter handles documents with only front matter", {
   skip_if_not_installed("yaml12")
 
   text <- "---\ntitle: Test\n---"
-  result <- front_matter_text(text)
+  result <- parse_front_matter(text)
 
   expect_equal(result$data$title, "Test")
   expect_equal(result$body, "")
 })
 
-test_that("front_matter_text validates input", {
-  expect_error(front_matter_text(123), "must be a character vector")
+test_that("parse_front_matter validates input", {
+  expect_error(parse_front_matter(123), "must be a character vector")
 })
 
-test_that("front_matter_text accepts multi-element vectors", {
+test_that("parse_front_matter accepts multi-element vectors", {
   skip_if_not_installed("yaml12")
 
   # Multi-element vectors are joined with newlines (as from readLines())
   lines <- c("---", "title: Test", "---", "Body content")
-  result <- front_matter_text(lines)
+  result <- parse_front_matter(lines)
 
   expect_equal(result$data$title, "Test")
   expect_equal(result$body, "Body content")
 })
 
-test_that("front_matter_text validates parsers argument", {
+test_that("parse_front_matter validates parsers argument", {
   text <- "---\ntitle: Test\n---\nBody"
 
   expect_error(
-    front_matter_text(text, parsers = "invalid"),
+    parse_front_matter(text, parsers = "invalid"),
     "must be a list with elements"
   )
 
   expect_error(
-    front_matter_text(text, parsers = list(yaml = "not a function")),
+    parse_front_matter(text, parsers = list(yaml = "not a function")),
     "must be a list with elements"
   )
 
   expect_error(
-    front_matter_text(
+    parse_front_matter(
       text,
       parsers = list(yaml = identity, toml = "not a function")
     ),
@@ -84,7 +84,7 @@ test_that("front_matter_text validates parsers argument", {
   )
 })
 
-test_that("front_matter_text handles multiline YAML", {
+test_that("parse_front_matter handles multiline YAML", {
   skip_if_not_installed("yaml12")
 
   text <- "---
@@ -98,7 +98,7 @@ tags:
 ---
 Content"
 
-  result <- front_matter_text(text)
+  result <- parse_front_matter(text)
 
   expect_equal(result$data$title, "Test")
   expect_true(grepl("Multi-line", result$data$description))
@@ -106,7 +106,7 @@ Content"
   expect_equal(result$body, "Content")
 })
 
-test_that("front_matter_read reads files correctly", {
+test_that("read_front_matter reads files correctly", {
   skip_if_not_installed("yaml12")
 
   # Create a temporary file
@@ -116,18 +116,18 @@ test_that("front_matter_read reads files correctly", {
   # writeLines adds a trailing newline, which is preserved
   writeLines("---\ntitle: Test\n---\nBody", tmp)
 
-  result <- front_matter_read(tmp)
+  result <- read_front_matter(tmp)
 
   expect_equal(result$data$title, "Test")
   expect_equal(result$body, "Body\n")
 })
 
-test_that("front_matter_read validates input", {
-  expect_error(front_matter_read(123), "must be a single string")
-  expect_error(front_matter_read("nonexistent.md"), "File does not exist")
+test_that("read_front_matter validates input", {
+  expect_error(read_front_matter(123), "must be a single string")
+  expect_error(read_front_matter("nonexistent.md"), "File does not exist")
 })
 
-test_that("front_matter_read handles files with CRLF line endings", {
+test_that("read_front_matter handles files with CRLF line endings", {
   skip_if_not_installed("yaml12")
 
   tmp <- tempfile(fileext = ".md")
@@ -138,13 +138,13 @@ test_that("front_matter_read handles files with CRLF line endings", {
   writeChar("---\r\ntitle: Test\r\n---\r\nBody\r\n", con, eos = NULL)
   close(con)
 
-  result <- front_matter_read(tmp)
+  result <- read_front_matter(tmp)
 
   expect_equal(result$data$title, "Test")
   expect_equal(result$body, "Body\r\n")
 })
 
-test_that("front_matter_read handles files without trailing newline", {
+test_that("read_front_matter handles files without trailing newline", {
   skip_if_not_installed("yaml12")
 
   tmp <- tempfile(fileext = ".md")
@@ -154,7 +154,7 @@ test_that("front_matter_read handles files without trailing newline", {
   writeChar("---\ntitle: Test\n---\nBody", con, eos = NULL)
   close(con)
 
-  result <- front_matter_read(tmp)
+  result <- read_front_matter(tmp)
 
   expect_equal(result$data$title, "Test")
   expect_equal(result$body, "Body")
