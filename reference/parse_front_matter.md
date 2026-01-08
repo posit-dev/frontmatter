@@ -88,5 +88,4 @@ tmpfile <- tempfile(fileext = ".md")
 writeLines(text, tmpfile)
 
 result <- read_front_matter(tmpfile)
-#> Error in parse_front_matter(text, parsers = parsers): {.arg parsers} must be a list with elements {.val yaml} and {.val toml}.
 ```
