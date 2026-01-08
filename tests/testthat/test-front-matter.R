@@ -76,7 +76,10 @@ test_that("front_matter_text validates parsers argument", {
   )
 
   expect_error(
-    front_matter_text(text, parsers = list(yaml = identity, toml = "not a function")),
+    front_matter_text(
+      text,
+      parsers = list(yaml = identity, toml = "not a function")
+    ),
     "must be a function"
   )
 })

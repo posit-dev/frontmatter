@@ -122,10 +122,12 @@ front_matter_read <- function(path, parsers = NULL) {
   raw_bytes <- readBin(path, "raw", n = file_size)
 
   # Strip UTF-8 BOM (EF BB BF) if present
-  if (length(raw_bytes) >= 3 &&
+  if (
+    length(raw_bytes) >= 3 &&
       raw_bytes[1] == as.raw(0xEF) &&
       raw_bytes[2] == as.raw(0xBB) &&
-      raw_bytes[3] == as.raw(0xBF)) {
+      raw_bytes[3] == as.raw(0xBF)
+  ) {
     raw_bytes <- raw_bytes[-c(1:3)]
   }
 

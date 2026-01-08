@@ -41,13 +41,16 @@ test_that("large comment-wrapped front matter is parsed correctly", {
 })
 
 test_that("large PEP 723 block is parsed correctly", {
-
   skip_if_not_installed("toml")
 
   # Create large PEP 723 block with an array (TOML doesn't allow duplicate keys)
   # Each line must start with "# " for valid PEP 723
   array_items <- paste(rep("#   \"value\",\n", 11000), collapse = "")
-  text <- paste0("# /// script\n# dependencies = [\n", array_items, "# ]\n# ///\nBody")
+  text <- paste0(
+    "# /// script\n# dependencies = [\n",
+    array_items,
+    "# ]\n# ///\nBody"
+  )
 
   result <- front_matter_text(text)
 
