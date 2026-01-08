@@ -15,6 +15,36 @@ template:
     version: 5
     preset: default
     brand:
+      color:
+        palette:
+          # Core brand colors extracted from the image
+          cyan: "#00D9E1"        # Bright cyan from the left side energy burst
+          blue: "#2E7FD9"        # Deep blue from the negative charge sphere
+          indigo: "#4A5FD9"      # Bridging blue-purple spectrum
+          purple: "#7B4FD9"      # Purple transitioning from blue
+          pink: "#D94FA8"        # Pink-magenta midpoint
+          red: "#D9534F"         # Red transitioning to orange
+          orange: "#FF8C42"      # Vibrant orange from the positive charge sphere
+          yellow: "#FFD93D"      # Bright yellow from the center energy burst
+          green: "#72D963"       # Green (complementary balance)
+          teal: "#00C9B8"        # Teal between cyan and green
+          white: "#FFFFFF"       # Pure white from energy highlights
+          black: "#0A0F1A"       # Deep black from the background
+          gray: "#4A5568"        # Neutral gray for UI elements
+
+        # Semantic colors using the palette
+        foreground: black
+        background: white
+        primary: cyan          # The striking cyan is the most distinctive brand color
+        secondary: gray
+        tertiary: "#E2E8F0"    # Light gray for subtle backgrounds
+        success: green
+        info: blue
+        warning: yellow
+        danger: orange         # Using orange as it's prominent and energetic
+        light: white
+        dark: black
+
       typography:
         fonts:
           - family: Source Code Pro
@@ -23,3 +53,15 @@ template:
             source: bunny
         base: Source Sans Pro
         monospace: Source Code Pro
+        link:
+          color: "1B7A7E"
+
+    navbar-padding-y: 1rem
+    pkgdown-nav-height: 72px
+    navbar-light-bg: "#fbeece"      # Very light cyan tint for light mode navbar
+    navbar-dark-bg: "#1e5baa"       # Deep black from the image background
+    code-color-dark: "#FF8C42"      # Vibrant orange for code in dark mode
+    code-bg: "#F0F9FA"              # Subtle cyan-tinted background for code blocks
+    link-color: "#1B7A7E"           # Darker teal-cyan for light backgrounds (good contrast)
+    link-color-dark: "#00D9E1"      # Bright cyan for dark backgrounds (high visibility)
+

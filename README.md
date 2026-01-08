@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# frontmatter
+# frontmatter <a href="https://posit-dev.github.io/frontmatter/"><img src="man/figures/logo.png" align="right" height="138" alt="frontmatter website" /></a>
 
 <!-- badges: start -->
 
@@ -189,7 +189,7 @@ str(parse_front_matter(text_yaml, parsers = metadata_parser))
 #>   ..$ title    : chr "My Document"
 #>   ..$ date     : chr "2024-01-01"
 #>   ..$ tags     : chr [1:2] "tutorial" "R"
-#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-08 16:30:14"
+#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-08 18:08:24"
 #>  $ body: chr "Document content starts here."
 ```
 
