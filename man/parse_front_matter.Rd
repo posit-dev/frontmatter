@@ -7,7 +7,7 @@
 \usage{
 parse_front_matter(text, parsers = front_matter_parsers())
 
-read_front_matter(path, parsers = NULL)
+read_front_matter(path, parsers = front_matter_parsers())
 }
 \arguments{
 \item{text}{A character string or vector containing the document text. If a

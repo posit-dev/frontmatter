@@ -35,6 +35,15 @@ Uses C++11 for fast, single-pass parsing with minimal memory overhead.
 Designed for high throughput processing of many documents.
 }
 
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/posit-dev/frontmatter}
+  \item \url{https://posit-dev.github.io/frontmatter/}
+  \item Report bugs at \url{https://github.com/posit-dev/frontmatter/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Garrick Aden-Buie \email{garrick@adenbuie.com} (\href{https://orcid.org/0000-0002-7111-0077}{ORCID})
 
