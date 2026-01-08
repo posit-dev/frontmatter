@@ -7,13 +7,9 @@
 front_matter_parsers(yaml = NULL, toml = NULL)
 }
 \arguments{
-\item{yaml}{A function that takes a string and returns a parsed R object, or
-\code{NULL} to use the default YAML parser. Use \code{identity} to return the raw
-YAML string without parsing.}
-
-\item{toml}{A function that takes a string and returns a parsed R object, or
-\code{NULL} to use the default TOML parser. Use \code{identity} to return the raw
-TOML string without parsing.}
+\item{yaml, toml}{A function that takes a string and returns a parsed R
+object, or \code{NULL} to use the default YAML or TOML parser. Use \code{identity} to
+return the raw YAML or TOML string without parsing.}
 }
 \value{
 A named list with elements \code{yaml} and \code{toml} containing parser
@@ -30,6 +26,9 @@ parsers <- front_matter_parsers()
 
 # Get raw YAML without parsing
 parsers <- front_matter_parsers(yaml = identity)
+
+# Or another YAML parser
+# parsers <- front_matter_parsers(yaml = yaml::yaml.load)
 
 # Use a custom parser that adds metadata
 parsers <- front_matter_parsers(

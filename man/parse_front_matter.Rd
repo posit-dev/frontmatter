@@ -2,9 +2,12 @@
 % Please edit documentation in R/front-matter.R
 \name{parse_front_matter}
 \alias{parse_front_matter}
-\title{Parse Front Matter from Text}
+\alias{read_front_matter}
+\title{Parse YAML or TOML Front Matter}
 \usage{
-parse_front_matter(text, parsers = NULL)
+parse_front_matter(text, parsers = front_matter_parsers())
+
+read_front_matter(path, parsers = NULL)
 }
 \arguments{
 \item{text}{A character string or vector containing the document text. If a
@@ -13,6 +16,10 @@ vector with multiple elements, they are joined with newlines (as from
 
 \item{parsers}{An optional list of parser functions created by
 \code{\link[=front_matter_parsers]{front_matter_parsers()}}. If \code{NULL}, default parsers are used.}
+
+\item{path}{A character string specifying the path to a file. The file is
+assumed to be UTF-8 encoded. A UTF-8 BOM (byte order mark) at the start
+of the file is automatically stripped if present.}
 }
 \value{
 A named list with two elements:
@@ -24,10 +31,19 @@ lines removed. If no front matter is found, this is the original text.
 }
 }
 \description{
-Extract and parse YAML or TOML front matter from a text string. Front matter
-is structured metadata at the beginning of a document, delimited by fences
-(\verb{---} for YAML, \verb{+++} for TOML).
+Extract and parse YAML or TOML front matter from a file or a text string.
+Front matter is structured metadata at the beginning of a document, delimited
+by fences (\verb{---} for YAML, \verb{+++} for TOML). \code{parse_front_matter()} processes
+a character string, while \code{read_front_matter()} reads from a file. Both
+functions return a list with the parsed front matter and the document body.
 }
+\section{Functions}{
+\itemize{
+\item \code{parse_front_matter()}: Parse front matter from text
+
+\item \code{read_front_matter()}: Parse front matter from a file.
+
+}}
 \examples{
 # Parse YAML front matter
 text <- "---
@@ -54,5 +70,11 @@ result <- parse_front_matter(
   text,
   parsers = front_matter_parsers(yaml = identity)
 )
+
+# Or read from a file
+tmpfile <- tempfile(fileext = ".md")
+writeLines(text, tmpfile)
+
+result <- read_front_matter(tmpfile)
 
 }

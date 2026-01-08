@@ -4,12 +4,9 @@
 #' the package uses `yaml12::parse_yaml()` for YAML and `toml::parse_toml()` for
 #' TOML. You can provide custom parser functions to override these defaults.
 #'
-#' @param yaml A function that takes a string and returns a parsed R object, or
-#'   `NULL` to use the default YAML parser. Use `identity` to return the raw
-#'   YAML string without parsing.
-#' @param toml A function that takes a string and returns a parsed R object, or
-#'   `NULL` to use the default TOML parser. Use `identity` to return the raw
-#'   TOML string without parsing.
+#' @param yaml,toml A function that takes a string and returns a parsed R
+#'   object, or `NULL` to use the default YAML or TOML parser. Use `identity` to
+#'   return the raw YAML or TOML string without parsing.
 #'
 #' @return A named list with elements `yaml` and `toml` containing parser
 #'   functions.
@@ -20,6 +17,9 @@
 #'
 #' # Get raw YAML without parsing
 #' parsers <- front_matter_parsers(yaml = identity)
+#'
+#' # Or another YAML parser
+#' # parsers <- front_matter_parsers(yaml = yaml::yaml.load)
 #'
 #' # Use a custom parser that adds metadata
 #' parsers <- front_matter_parsers(
