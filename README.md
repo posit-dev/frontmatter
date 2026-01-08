@@ -3,6 +3,7 @@
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/frontmatter)](https://CRAN.R-project.org/package=frontmatter)
+[![R-CMD-check](https://github.com/posit-dev/frontmatter/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/posit-dev/frontmatter/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Overview
