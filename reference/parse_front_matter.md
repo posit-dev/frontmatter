@@ -12,7 +12,7 @@ with the parsed front matter and the document body.
 ``` r
 parse_front_matter(text, parsers = front_matter_parsers())
 
-read_front_matter(path, parsers = NULL)
+read_front_matter(path, parsers = front_matter_parsers())
 ```
 
 ## Arguments

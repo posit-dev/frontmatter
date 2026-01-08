@@ -30,6 +30,16 @@ by fences.
 Uses C++11 for fast, single-pass parsing with minimal memory overhead.
 Designed for high throughput processing of many documents.
 
+## See also
+
+Useful links:
+
+- <https://github.com/posit-dev/frontmatter>
+
+- <https://posit-dev.github.io/frontmatter/>
+
+- Report bugs at <https://github.com/posit-dev/frontmatter/issues>
+
 ## Author
 
 **Maintainer**: Garrick Aden-Buie <garrick@adenbuie.com>
