@@ -128,9 +128,9 @@ str(parse_front_matter(text_roxy))
 
 ``` py
 # /// script
-# requires-python = \">=3.11\"
+# requires-python = ">=3.11"
 # dependencies = [
-#     \"requests<3\",
+#     "requests<3",
 # ]
 # ///
 
@@ -172,7 +172,7 @@ str(parse_front_matter(text_yaml, parsers = metadata_parser))
 #>   ..$ title    : chr "My Document"
 #>   ..$ date     : chr "2024-01-01"
 #>   ..$ tags     : chr [1:2] "tutorial" "R"
-#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-08 14:55:12"
+#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-08 15:10:32"
 #>  $ body: chr "Document content starts here."
 ```
 
