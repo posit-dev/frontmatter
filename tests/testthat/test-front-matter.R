@@ -113,8 +113,10 @@ test_that("read_front_matter reads files correctly", {
   tmp <- tempfile(fileext = ".md")
   on.exit(unlink(tmp))
 
-  # writeLines adds a trailing newline, which is preserved
-  writeLines("---\ntitle: Test\n---\nBody", tmp)
+  # Binary write to ensure consistent LF line endings across platforms
+  con <- file(tmp, "wb")
+  writeChar("---\ntitle: Test\n---\nBody\n", con, eos = NULL)
+  close(con)
 
   result <- read_front_matter(tmp)
 
