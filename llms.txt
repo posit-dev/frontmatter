@@ -4,9 +4,13 @@
 
 `frontmatter` extracts and parses structured metadata (YAML or TOML)
 from the beginning of text documents. Front matter is a common pattern
-in static site generators, documentation systems, and content management
-tools where metadata is placed at the top of a document, separated from
-the main content by delimiter fences.
+in [Quarto documents](https://quarto.org/), [R Markdown
+documents](https://rmarkdown.rstudio.com/), static site generators,
+documentation systems, content management tools and even
+[Python](https://packaging.python.org/en/latest/specifications/inline-script-metadata/#inline-script-metadata)
+and [R scripts](https://bookdown.org/yihui/rmarkdown-cookbook/spin.html)
+where metadata is placed at the top of a document, separated from the
+main content by delimiter fences.
 
 ## Features
 
@@ -175,7 +179,7 @@ str(parse_front_matter(text_yaml, parsers = metadata_parser))
 #>   ..$ title    : chr "My Document"
 #>   ..$ date     : chr "2024-01-01"
 #>   ..$ tags     : chr [1:2] "tutorial" "R"
-#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-08 15:31:26"
+#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-08 16:30:14"
 #>  $ body: chr "Document content starts here."
 ```
 
