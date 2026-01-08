@@ -54,7 +54,7 @@ size_t validate_fence(const char* str, size_t pos, size_t len, const char* fence
 
   // Check fence characters (exactly 3)
   if (pos + 3 > len) return 0;
-  if (str[pos] != fence_chars[0] || str[pos + 1] != fence_chars[1] || str[pos + 2] != fence_chars[2]) {
+  if (memcmp(str + pos, fence_chars, 3) != 0) {
     return 0;
   }
 
@@ -144,16 +144,16 @@ std::string trim_leading_empty_lines(const std::string& body) {
 // Helper: Check if line starts with comment prefix and fence
 // Returns 0 if not found, otherwise returns length of prefix + fence
 size_t check_comment_fence(const char* str, size_t pos, size_t len, const char* fence_chars, const char** out_prefix) {
-  // Try "# " prefix
+  // Try "# " prefix: "# ---" or "# +++"
   if (pos + 5 <= len && str[pos] == '#' && str[pos + 1] == ' ' &&
-      str[pos + 2] == fence_chars[0] && str[pos + 3] == fence_chars[1] && str[pos + 4] == fence_chars[2]) {
+      memcmp(str + pos + 2, fence_chars, 3) == 0) {
     *out_prefix = "# ";
     return 5;  // Length of "# ---" or "# +++"
   }
 
-  // Try "#'" prefix (Roxygen style)
-  if (pos + 5 <= len && str[pos] == '#' && str[pos + 1] == '\'' &&
-      str[pos + 2] == ' ' && str[pos + 3] == fence_chars[0] && str[pos + 4] == fence_chars[1] && str[pos + 5] == fence_chars[2]) {
+  // Try "#'" prefix (Roxygen style): "#' ---" or "#' +++"
+  if (pos + 6 <= len && str[pos] == '#' && str[pos + 1] == '\'' &&
+      str[pos + 2] == ' ' && memcmp(str + pos + 3, fence_chars, 3) == 0) {
     *out_prefix = "#' ";
     return 6;  // Length of "#' ---" or "#' +++"
   }
@@ -167,33 +167,35 @@ std::string unwrap_comments(const std::string& content, const char* prefix) {
   std::string result;
   result.reserve(content.length());
 
+  const char* data = content.data();
   size_t pos = 0;
   size_t len = content.length();
 
   while (pos < len) {
-    size_t line_start = pos;
+    size_t line_content_start = pos;
 
     // Check if line starts with full prefix (e.g., "# " or "#' ")
-    if (pos + prefix_len <= len && content.substr(pos, prefix_len) == prefix) {
+    if (pos + prefix_len <= len && memcmp(data + pos, prefix, prefix_len) == 0) {
       // Skip the full prefix
-      pos += prefix_len;
-    } else if (content[pos] == '#') {
+      line_content_start = pos + prefix_len;
+      pos = line_content_start;
+    } else if (data[pos] == '#') {
       // Check for bare "#" (empty comment line) - only if prefix starts with #
       if (prefix[0] == '#') {
         size_t check_pos = pos + 1;
 
         // For "#' " prefix, check for bare "#'"
-        if (prefix_len == 3 && prefix[1] == '\'' && check_pos < len && content[check_pos] == '\'') {
+        if (prefix_len == 3 && prefix[1] == '\'' && check_pos < len && data[check_pos] == '\'') {
           check_pos++;
           // Skip trailing whitespace/newline
-          while (check_pos < len && is_whitespace(content[check_pos])) {
+          while (check_pos < len && is_whitespace(data[check_pos])) {
             check_pos++;
           }
-          if (check_pos >= len || content[check_pos] == '\n' || content[check_pos] == '\r') {
+          if (check_pos >= len || data[check_pos] == '\n' || data[check_pos] == '\r') {
             // It's bare "#'" - skip it entirely, don't add to result
             pos = check_pos;
-            if (pos < len && content[pos] == '\r') pos++;
-            if (pos < len && content[pos] == '\n') pos++;
+            if (pos < len && data[pos] == '\r') pos++;
+            if (pos < len && data[pos] == '\n') pos++;
             continue;
           }
         }
@@ -201,30 +203,37 @@ std::string unwrap_comments(const std::string& content, const char* prefix) {
         // For "# " prefix, check for bare "#"
         if (prefix_len == 2 && prefix[1] == ' ') {
           // Skip optional whitespace after bare #
-          while (check_pos < len && is_whitespace(content[check_pos])) {
+          while (check_pos < len && is_whitespace(data[check_pos])) {
             check_pos++;
           }
-          if (check_pos >= len || content[check_pos] == '\n' || content[check_pos] == '\r') {
+          if (check_pos >= len || data[check_pos] == '\n' || data[check_pos] == '\r') {
             // It's bare "#" - skip it entirely
             pos = check_pos;
-            if (pos < len && content[pos] == '\r') pos++;
-            if (pos < len && content[pos] == '\n') pos++;
+            if (pos < len && data[pos] == '\r') pos++;
+            if (pos < len && data[pos] == '\n') pos++;
             continue;
           }
         }
       }
     }
 
-    // Copy rest of line including newline
-    while (pos < len) {
-      char c = content[pos++];
-      result += c;
-      if (c == '\n' || (c == '\r' && pos < len && content[pos] == '\n')) {
-        if (c == '\r') {
-          result += content[pos++];  // Add the \n from CRLF
-        }
-        break;
+    // Find end of line
+    while (pos < len && data[pos] != '\n' && data[pos] != '\r') {
+      pos++;
+    }
+
+    // Include newline in the copy
+    if (pos < len) {
+      if (data[pos] == '\r' && pos + 1 < len && data[pos + 1] == '\n') {
+        pos += 2;  // CRLF
+      } else {
+        pos++;  // LF or CR
       }
+    }
+
+    // Copy entire line segment at once (from after prefix to end of line)
+    if (pos > line_content_start) {
+      result.append(data + line_content_start, pos - line_content_start);
     }
   }
 
@@ -269,6 +278,7 @@ size_t find_comment_closing_fence(const char* str, size_t start_pos, size_t len,
 
 // Helper: Trim leading comment lines and unwrap if continuous (for comment-wrapped formats)
 std::string trim_leading_comment_lines(const std::string& body, const char* prefix) {
+  const char* data = body.data();
   size_t pos = 0;
   size_t len = body.length();
   size_t prefix_len = strlen(prefix);
@@ -276,38 +286,36 @@ std::string trim_leading_comment_lines(const std::string& body, const char* pref
 
   // First, skip leading empty lines and bare comment lines
   while (pos < len) {
-    size_t line_start = pos;
-
     // Skip whitespace
-    while (pos < len && is_whitespace(body[pos])) {
+    while (pos < len && is_whitespace(data[pos])) {
       pos++;
     }
 
     // Check if line is empty (just whitespace + newline)
-    if (pos >= len || body[pos] == '\n' || (body[pos] == '\r' && pos + 1 < len && body[pos + 1] == '\n')) {
+    if (pos >= len || data[pos] == '\n' || (data[pos] == '\r' && pos + 1 < len && data[pos + 1] == '\n')) {
       // Empty line
       had_blank_line = true;
       if (pos < len) {
-        if (body[pos] == '\r') pos += 2;
+        if (data[pos] == '\r') pos += 2;
         else pos++;
       }
       continue;
     }
 
     // Check if line is just the comment prefix (e.g., "#'" or "# " with nothing after)
-    if (pos + prefix_len <= len && body.substr(pos, prefix_len) == prefix) {
+    if (pos + prefix_len <= len && memcmp(data + pos, prefix, prefix_len) == 0) {
       size_t after_prefix = pos + prefix_len;
       // Skip any remaining whitespace
-      while (after_prefix < len && is_whitespace(body[after_prefix])) {
+      while (after_prefix < len && is_whitespace(data[after_prefix])) {
         after_prefix++;
       }
       // If line ends here, it's just a bare comment line - skip it
-      if (after_prefix >= len || body[after_prefix] == '\n' || (body[after_prefix] == '\r' && after_prefix + 1 < len && body[after_prefix + 1] == '\n')) {
+      if (after_prefix >= len || data[after_prefix] == '\n' || (data[after_prefix] == '\r' && after_prefix + 1 < len && data[after_prefix + 1] == '\n')) {
         // Skip to next line
         pos = after_prefix;
         if (pos < len) {
-          if (body[pos] == '\r') pos += 2;
-          else if (body[pos] == '\n') pos++;
+          if (data[pos] == '\r') pos += 2;
+          else if (data[pos] == '\n') pos++;
         }
         continue;
       }
