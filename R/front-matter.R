@@ -61,7 +61,8 @@ parse_front_matter <- function(text, parsers = front_matter_parsers()) {
 
   if (!is.list(parsers)) {
     rlang::abort(
-      "{.arg parsers} must be a list with elements {.val yaml} and {.val toml}."
+      "{.arg parsers} must be a list with elements {.val yaml} and {.val toml}.",
+      use_cli_format = TRUE
     )
   }
 
@@ -96,7 +97,7 @@ parse_front_matter <- function(text, parsers = front_matter_parsers()) {
 #'   of the file is automatically stripped if present.
 #'
 #' @export
-read_front_matter <- function(path, parsers = NULL) {
+read_front_matter <- function(path, parsers = front_matter_parsers()) {
   check_string(path)
 
   if (!file.exists(path)) {

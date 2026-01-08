@@ -72,7 +72,7 @@ test_that("parse_front_matter validates parsers argument", {
 
   expect_error(
     parse_front_matter(text, parsers = list(yaml = "not a function")),
-    "must be a list with elements"
+    "`yaml` must be a function"
   )
 
   expect_error(
