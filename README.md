@@ -1,13 +1,9 @@
+
 # frontmatter
 
-Parse YAML or TOML front matter from text documents.
-
-## Installation
-
-```r
-# Install from source
-devtools::install()
-```
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/frontmatter)](https://CRAN.R-project.org/package=frontmatter)
+<!-- badges: end -->
 
 ## Overview
 
@@ -167,7 +163,3 @@ The package uses C++11 for optimal performance:
 - Efficient fence detection and validation
 
 Designed for high throughput processing of many documents.
-
-## License
-
-MIT License
