@@ -10,6 +10,8 @@ Description: Extracts YAML or TOML front matter from the beginning of
     tools. The package provides fast C++ parsing with support for standard
     delimited formats and comment-wrapped formats in R and Python files.
 License: MIT + file LICENSE
+URL: https://github.com/posit-dev/frontmatter
+BugReports: https://github.com/posit-dev/frontmatter/issues
 Imports:
     cpp11,
     rlang,
