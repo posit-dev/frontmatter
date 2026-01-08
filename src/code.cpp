@@ -3,10 +3,6 @@
 #include <cstring>
 using namespace cpp11;
 
-// Security limits
-const size_t MAX_FRONT_MATTER_SIZE = 1048576;  // 1 MB
-const size_t MAX_FRONT_MATTER_LINES = 10000;
-
 // PEP 723 delimiter lengths
 // Opening: "# /// script" (12 chars, need 13 to check for trailing content)
 const size_t PEP723_OPENING_LEN = 12;
@@ -90,8 +86,6 @@ size_t validate_fence(const char* str, size_t pos, size_t len, const char* fence
 // Returns position where fence line starts, or 0 if not found
 size_t find_closing_fence(const char* str, size_t start_pos, size_t len, const char* fence_chars, size_t& content_end) {
   size_t pos = start_pos;
-  size_t line_count = 0;
-  size_t content_size = 0;
 
   while (pos < len) {
     // Check if we're at start of a line and this could be a closing fence
@@ -108,15 +102,7 @@ size_t find_closing_fence(const char* str, size_t start_pos, size_t len, const c
     }
 
     // Not a closing fence, move to next line
-    size_t line_start = pos;
     pos = skip_to_next_line(str, pos, len);
-
-    // Check security limits
-    line_count++;
-    content_size += (pos - line_start);
-    if (line_count > MAX_FRONT_MATTER_LINES || content_size > MAX_FRONT_MATTER_SIZE) {
-      return 0;  // Exceeded limits
-    }
   }
 
   return 0;  // No closing fence found
@@ -248,9 +234,6 @@ std::string unwrap_comments(const std::string& content, const char* prefix) {
 // Helper: Find closing fence for comment-wrapped format
 size_t find_comment_closing_fence(const char* str, size_t start_pos, size_t len, const char* fence_chars, const char* prefix, size_t& content_end) {
   size_t pos = start_pos;
-  size_t line_count = 0;
-  size_t content_size = 0;
-  size_t prefix_len = strlen(prefix);
 
   while (pos < len) {
     // Check if we're at start of a line
@@ -278,15 +261,7 @@ size_t find_comment_closing_fence(const char* str, size_t start_pos, size_t len,
     }
 
     // Move to next line
-    size_t line_start = pos;
     pos = skip_to_next_line(str, pos, len);
-
-    // Check security limits
-    line_count++;
-    content_size += (pos - line_start);
-    if (line_count > MAX_FRONT_MATTER_LINES || content_size > MAX_FRONT_MATTER_SIZE) {
-      return 0;
-    }
   }
 
   return 0;
@@ -404,8 +379,6 @@ list extract_pep723(const std::string& text) {
   // Skip opening line
   size_t pos = skip_to_next_line(str, 0, len);
   size_t content_start = pos;
-  size_t line_count = 0;
-  size_t content_size = 0;
 
   // Find closing delimiter and validate all lines in between
   while (pos < len) {
@@ -455,19 +428,7 @@ list extract_pep723(const std::string& text) {
     }
 
     // Move to next line
-    size_t line_start = pos;
     pos = skip_to_next_line(str, pos, len);
-
-    // Check security limits
-    line_count++;
-    content_size += (pos - line_start);
-    if (line_count > MAX_FRONT_MATTER_LINES || content_size > MAX_FRONT_MATTER_SIZE) {
-      result.push_back({"found"_nm = false});
-      result.push_back({"fence_type"_nm = "none"});
-      result.push_back({"content"_nm = ""});
-      result.push_back({"body"_nm = text});
-      return result;
-    }
   }
 
   // No closing delimiter found

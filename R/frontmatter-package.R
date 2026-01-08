@@ -19,11 +19,6 @@
 #' Uses C++11 for fast, single-pass parsing with minimal memory overhead.
 #' Designed for high throughput processing of many documents.
 #'
-#' @section Security:
-#' Implements limits to prevent DoS attacks:
-#' * Max front matter size: 1 MB
-#' * Max line count: 10,000 lines
-#'
 #' @keywords internal
 "_PACKAGE"
 

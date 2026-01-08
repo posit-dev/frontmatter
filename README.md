@@ -21,7 +21,6 @@ devtools::install()
   - Standard TOML (`+++` delimiters)
   - Comment-wrapped formats for R and Python files (`#` and `#'` prefixes)
   - PEP 723 Python inline script metadata
-- **Security limits** to prevent DoS attacks (1MB max size, 10K max lines)
 - **Flexible parser integration** - use default parsers or provide your own
 - **Graceful handling** of invalid front matter
 
@@ -158,15 +157,6 @@ result$body  # Original text
 ```
 
 Parser errors propagate to the caller for proper error handling.
-
-## Security
-
-The package implements security limits to prevent denial-of-service attacks:
-
-- Maximum front matter size: 1 MB
-- Maximum line count: 10,000 lines
-
-Documents exceeding these limits are treated as having no front matter.
 
 ## Performance
 

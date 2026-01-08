@@ -35,15 +35,6 @@ Uses C++11 for fast, single-pass parsing with minimal memory overhead.
 Designed for high throughput processing of many documents.
 }
 
-\section{Security}{
-
-Implements limits to prevent DoS attacks:
-\itemize{
-\item Max front matter size: 1 MB
-\item Max line count: 10,000 lines
-}
-}
-
 \author{
 \strong{Maintainer}: Garrick Aden-Buie \email{garrick@adenbuie.com} (\href{https://orcid.org/0000-0002-7111-0077}{ORCID})
 
