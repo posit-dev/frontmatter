@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R:
     person("Garrick", "Aden-Buie", , "garrick@adenbuie.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7111-0077"))
-Description: Extracts YAML or TOML front matter from the beginning of
+Description: Extracts 'YAML' or 'TOML' front matter from the beginning of
     documents.  Front matter is structured metadata commonly used in
     static site generators, documentation systems, and content management
     tools. The package provides fast C++ parsing with support for standard

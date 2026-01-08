@@ -22,11 +22,14 @@ the main content by delimiter fences.
 
 - **Fast C++ parsing** for optimal performance
 - **Multiple formats supported:**
-  - Standard YAML (`---` delimiters)
-  - Standard TOML (`+++` delimiters)
+  - Standard [YAML](https://posit-dev.github.io/r-yaml12/) (`---`
+    delimiters)
+  - Standard [TOML](https://cran.r-project.org/package=toml) (`+++`
+    delimiters)
   - Comment-wrapped formats for R and Python files (`#` and `#'`
     prefixes)
-  - PEP 723 Python inline script metadata
+  - [PEP 723](https://peps.python.org/pep-0723/) Python [inline script
+    metadata](https://packaging.python.org/en/latest/specifications/inline-script-metadata/#inline-script-metadata)
 - **Flexible parser integration** - use default parsers or provide your
   own
 - **Graceful handling** of invalid front matter
@@ -182,7 +185,7 @@ str(parse_front_matter(text_yaml, parsers = metadata_parser))
 #>   ..$ title    : chr "My Document"
 #>   ..$ date     : chr "2024-01-01"
 #>   ..$ tags     : chr [1:2] "tutorial" "R"
-#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-08 15:10:32"
+#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-08 15:31:26"
 #>  $ body: chr "Document content starts here."
 ```
 
