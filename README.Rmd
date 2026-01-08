@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-`frontmatter` extracts and parses structured metadata (YAML or TOML) from the beginning of text documents. Front matter is a common pattern in static site generators, documentation systems, and content management tools where metadata is placed at the top of a document, separated from the main content by delimiter fences.
+`frontmatter` extracts and parses structured metadata (YAML or TOML) from the beginning of text documents. Front matter is a common pattern in [Quarto documents](https://quarto.org/), [R Markdown documents](https://rmarkdown.rstudio.com/), static site generators, documentation systems, content management tools and even [Python](https://packaging.python.org/en/latest/specifications/inline-script-metadata/#inline-script-metadata) and [R scripts](https://bookdown.org/yihui/rmarkdown-cookbook/spin.html) where metadata is placed at the top of a document, separated from the main content by delimiter fences.
 
 ## Features
 
