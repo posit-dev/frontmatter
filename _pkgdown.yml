@@ -1,0 +1,25 @@
+url: https://posit-dev.github.io/frontmatter/
+
+# development:
+#   mode: auto
+
+authors:
+  Garrick Aden-Buie:
+    href: https://garrickadenbuie.com
+
+template:
+  light-switch: true
+  theme: github-light
+  theme-dark: github-dark
+  bslib:
+    version: 5
+    preset: default
+    brand:
+      typography:
+        fonts:
+          - family: Source Code Pro
+            source: bunny
+          - family: Source Sans Pro
+            source: bunny
+        base: Source Sans Pro
+        monospace: Source Code Pro
