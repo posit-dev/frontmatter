@@ -87,5 +87,16 @@ result <- parse_front_matter(
 tmpfile <- tempfile(fileext = ".md")
 writeLines(text, tmpfile)
 
-result <- read_front_matter(tmpfile)
+read_front_matter(tmpfile)
+#> $data
+#> $data$title
+#> [1] "My Document"
+#> 
+#> $data$date
+#> [1] "2024-01-01"
+#> 
+#> 
+#> $body
+#> [1] "Document content\n"
+#> 
 ```
