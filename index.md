@@ -166,17 +166,17 @@ str(parse_front_matter(text_yaml, parse_yaml = identity))
 # Use a custom parser that adds metadata
 custom_parser <- function(x) {
   data <- yaml12::parse_yaml(x)
-  data$parsed_at <- Sys.time()
+  data$.parsed_with <- "{frontmatter}"
   data
 }
 
 str(parse_front_matter(text_yaml, parse_yaml = custom_parser))
 #> List of 2
 #>  $ data:List of 4
-#>   ..$ title    : chr "My Document"
-#>   ..$ date     : chr "2024-01-01"
-#>   ..$ tags     : chr [1:2] "tutorial" "R"
-#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-09 09:51:28"
+#>   ..$ title       : chr "My Document"
+#>   ..$ date        : chr "2024-01-01"
+#>   ..$ tags        : chr [1:2] "tutorial" "R"
+#>   ..$ .parsed_with: chr "{frontmatter}"
 #>  $ body: chr "Document content starts here."
 ```
 

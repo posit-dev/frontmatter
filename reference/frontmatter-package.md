@@ -39,5 +39,10 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Garrick Aden-Buie <garrick@adenbuie.com>
+**Maintainer**: Garrick Aden-Buie <garrick@posit.co>
 ([ORCID](https://orcid.org/0000-0002-7111-0077))
+
+Other contributors:
+
+- Posit Software, PBC ([ROR](https://ror.org/03wc8by49)) \[copyright
+  holder, funder\]

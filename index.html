@@ -30,7 +30,7 @@
 
     <a class="navbar-brand me-2" href="index.html">frontmatter</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,6 +40,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -223,17 +224,17 @@
 <span><span class="co"># Use a custom parser that adds metadata</span></span>
 <span><span class="va">custom_parser</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">yaml12</span><span class="fu">::</span><span class="fu"><a href="https://posit-dev.github.io/r-yaml12/reference/parse_yaml.html" class="external-link">parse_yaml</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span>  <span class="va">data</span><span class="op">$</span><span class="va">parsed_at</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">data</span><span class="op">$</span><span class="va">.parsed_with</span> <span class="op">&lt;-</span> <span class="st">"{frontmatter}"</span></span>
 <span>  <span class="va">data</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="reference/parse_front_matter.html">parse_front_matter</a></span><span class="op">(</span><span class="va">text_yaml</span>, parse_yaml <span class="op">=</span> <span class="va">custom_parser</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 2</span></span>
 <span><span class="co">#&gt;  $ data:List of 4</span></span>
-<span><span class="co">#&gt;   ..$ title    : chr "My Document"</span></span>
-<span><span class="co">#&gt;   ..$ date     : chr "2024-01-01"</span></span>
-<span><span class="co">#&gt;   ..$ tags     : chr [1:2] "tutorial" "R"</span></span>
-<span><span class="co">#&gt;   ..$ parsed_at: POSIXct[1:1], format: "2026-01-09 09:51:28"</span></span>
+<span><span class="co">#&gt;   ..$ title       : chr "My Document"</span></span>
+<span><span class="co">#&gt;   ..$ date        : chr "2024-01-01"</span></span>
+<span><span class="co">#&gt;   ..$ tags        : chr [1:2] "tutorial" "R"</span></span>
+<span><span class="co">#&gt;   ..$ .parsed_with: chr "{frontmatter}"</span></span>
 <span><span class="co">#&gt;  $ body: chr "Document content starts here."</span></span></code></pre></div>
 </div>
 </div>
@@ -339,6 +340,7 @@
 <ul class="list-unstyled">
 <li>
 <a href="https://garrickadenbuie.com" class="external-link">Garrick Aden-Buie</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-7111-0077" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Posit Software, PBC <br><small class="roles"> Copyright holder, funder </small>  <a href="https://ror.org/03wc8by49" class="external-link"><img src="https://raw.githubusercontent.com/ror-community/ror-logos/main/ror-icon-rgb.svg" class="ror" alt="ROR"></a> </li>
 </ul>
 </div>
 
@@ -355,7 +357,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://garrickadenbuie.com" class="external-link">Garrick Aden-Buie</a>.</p>
+  <p>Developed by <a href="https://garrickadenbuie.com" class="external-link">Garrick Aden-Buie</a>, Posit Software, PBC.</p>
 </div>
 
 <div class="pkgdown-footer-right">
