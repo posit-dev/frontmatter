@@ -8,6 +8,8 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/frontmatter)](https://CRAN.R-project.org/package=frontmatter)
 [![R-CMD-check](https://github.com/posit-dev/frontmatter/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/posit-dev/frontmatter/actions/workflows/R-CMD-check.yaml)
+[![R-universe
+version](https://posit-dev.r-universe.dev/frontmatter/badges/version)](https://posit-dev.r-universe.dev/frontmatter)
 <!-- badges: end -->
 
 ## Overview
