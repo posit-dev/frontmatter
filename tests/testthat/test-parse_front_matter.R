@@ -2,7 +2,7 @@ test_that("parse_front_matter parses YAML correctly", {
   text <- "---\ntitle: Test\ndate: 2024-01-01\n---\nBody content"
   result <- parse_front_matter(text)
 
-  expect_true(!is.null(result$data))
+  expect_false(is.null(result$data))
   expect_equal(result$data$title, "Test")
   expect_equal(result$data$date, "2024-01-01")
   expect_equal(result$body, "Body content")
@@ -12,7 +12,7 @@ test_that("parse_front_matter parses TOML correctly", {
   text <- "+++\ntitle = \"Test\"\ncount = 42\n+++\nBody content"
   result <- parse_front_matter(text)
 
-  expect_true(!is.null(result$data))
+  expect_false(is.null(result$data))
   expect_equal(result$data$title, "Test")
   expect_equal(result$data$count, 42)
   expect_equal(result$body, "Body content")

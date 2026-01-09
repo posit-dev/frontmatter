@@ -11,7 +11,7 @@ import requests"
 
   result <- parse_front_matter(text)
 
-  expect_true(!is.null(result$data))
+  expect_false(is.null(result$data))
   expect_equal(result$data$`requires-python`, ">=3.11")
   expect_equal(length(result$data$dependencies), 2)
   expect_equal(result$body, "import requests")
@@ -28,7 +28,7 @@ import requests"
 
   result <- parse_front_matter(text)
 
-  expect_true(!is.null(result$data))
+  expect_false(is.null(result$data))
   expect_equal(result$data$`requires-python`, ">=3.11")
 })
 

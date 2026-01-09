@@ -7,7 +7,7 @@ test_that("large front matter is parsed correctly", {
 
   # Large front matter should be parsed successfully
 
-  expect_true(!is.null(result$data))
+  expect_false(is.null(result$data))
   expect_equal(result$body, "Body")
 })
 
@@ -19,7 +19,7 @@ test_that("front matter with many lines is parsed correctly", {
   result <- parse_front_matter(text)
 
   # Should parse successfully
-  expect_true(!is.null(result$data))
+  expect_false(is.null(result$data))
   expect_equal(result$body, "Body")
 })
 
@@ -30,7 +30,7 @@ test_that("large comment-wrapped front matter is parsed correctly", {
 
   result <- parse_front_matter(text)
 
-  expect_true(!is.null(result$data))
+  expect_false(is.null(result$data))
   expect_equal(result$body, "Body")
 })
 
@@ -46,7 +46,7 @@ test_that("large PEP 723 block is parsed correctly", {
 
   result <- parse_front_matter(text)
 
-  expect_true(!is.null(result$data))
+  expect_false(is.null(result$data))
   expect_equal(result$body, "Body")
 })
 
