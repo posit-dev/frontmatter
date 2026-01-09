@@ -186,7 +186,7 @@ str(parse_front_matter(text_yaml, parse_yaml = custom_parser))
 #>   ..$ title    : chr "My Document"
 #>   ..$ date     : chr "2024-01-01"
 #>   ..$ tags     : chr [1:2] "tutorial" "R"
-#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-09 09:03:36"
+#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-09 09:42:09"
 #>  $ body: chr "Document content starts here."
 ```
 
@@ -194,6 +194,40 @@ str(parse_front_matter(text_yaml, parse_yaml = custom_parser))
 
 - **YAML**: Uses `yaml12::parse_yaml()` with YAML 1.2 support
 - **TOML**: Uses `tomledit::parse_toml()`
+
+### YAML 1.1 Support
+
+To use YAML 1.1 parsing (via the [yaml](https://yaml.r-lib.org) package)
+instead of the default YAML 1.2, set either:
+
+- The R option: `options(frontmatter.parse_yaml.spec = "1.1")`
+- The environment variable: `FRONTMATTER_PARSE_YAML_SPEC=1.1`
+
+The option takes precedence over the environment variable.
+
+``` md
+---
+# In YAML 1.1, 'yes' is parsed as TRUE
+enabled: yes
+---
+
+Content
+```
+
+``` r
+# Default (YAML 1.2): 'yes' is a string
+parse_front_matter(text_yaml11)$data
+#> $enabled
+#> [1] "yes"
+
+# With YAML 1.1: 'yes' is boolean TRUE
+rlang::with_options(
+  frontmatter.parse_yaml.spec = "1.1",
+  parse_front_matter(text_yaml11)$data
+)
+#> $enabled
+#> [1] TRUE
+```
 
 ## Error Handling
 

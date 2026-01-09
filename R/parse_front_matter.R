@@ -14,6 +14,21 @@
 #'
 #' Use `identity` to return the raw YAML or TOML string without parsing.
 #'
+#' @section YAML Specification Version:
+#'
+#' The default YAML parser uses YAML 1.2 via [yaml12::parse_yaml()]. To use
+#' YAML 1.1 parsing instead (via [yaml::yaml.load()]), set either:
+#'
+#' - The R option `frontmatter.parse_yaml.spec` to `"1.1"`
+#' - The environment variable `FRONTMATTER_PARSE_YAML_SPEC` to `"1.1"`
+#'
+#' The option takes precedence over the environment variable. Valid values are
+#' `"1.1"` and `"1.2"` (the default).
+#'
+#' YAML 1.1 differs from YAML 1.2 in several ways, most notably in how it
+#' handles boolean values (e.g., `yes`/`no` are booleans in 1.1 but strings
+#' in 1.2).
+#'
 #' @examples
 #' # Parse YAML front matter
 #' text <- "---

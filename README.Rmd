@@ -206,6 +206,42 @@ str(parse_front_matter(text_yaml, parse_yaml = custom_parser))
 - **YAML**: Uses `yaml12::parse_yaml()` with YAML 1.2 support
 - **TOML**: Uses `tomledit::parse_toml()`
 
+### YAML 1.1 Support
+
+To use YAML 1.1 parsing (via the [yaml](https://yaml.r-lib.org) package) instead of the default YAML 1.2, set either:
+
+- The R option: `options(frontmatter.parse_yaml.spec = "1.1")`
+- The environment variable: `FRONTMATTER_PARSE_YAML_SPEC=1.1`
+
+The option takes precedence over the environment variable.
+
+```md
+---
+# In YAML 1.1, 'yes' is parsed as TRUE
+enabled: yes
+---
+
+Content
+```
+
+```{r}
+#| echo: [-1, -2]
+text_yaml11 <- "---
+# In YAML 1.1, 'yes' is parsed as TRUE
+enabled: yes
+---
+Content"
+
+# Default (YAML 1.2): 'yes' is a string
+parse_front_matter(text_yaml11)$data
+
+# With YAML 1.1: 'yes' is boolean TRUE
+rlang::with_options(
+  frontmatter.parse_yaml.spec = "1.1",
+  parse_front_matter(text_yaml11)$data
+)
+```
+
 ## Error Handling
 
 Invalid front matter returns `NULL` as data and the original content unchanged:

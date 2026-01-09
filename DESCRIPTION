@@ -20,7 +20,8 @@ Imports:
     tomledit,
     yaml12
 Suggests:
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    yaml
 LinkingTo:
     cpp11
 Config/testthat/edition: 3
