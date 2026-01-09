@@ -1,4 +1,4 @@
 # License
 
-    YEAR: 2025
-    COPYRIGHT HOLDER: Garrick Aden-Buie
+    YEAR: 2026
+    COPYRIGHT HOLDER: frontmatter authors
