@@ -11,3 +11,4 @@
 ^\.claude$
 ^cran-comments\.md$
 ^README\.html$
+^LICENSE\.md$
