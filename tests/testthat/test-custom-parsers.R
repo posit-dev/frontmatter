@@ -30,8 +30,6 @@ test_that("both custom parsers can be specified", {
 })
 
 test_that("custom parser that transforms data works", {
-  skip_if_not_installed("yaml12")
-
   text <- "---\ntitle: Test\n---\nBody"
 
   # Custom parser that uppercases the title
@@ -95,8 +93,6 @@ test_that("parsers can return complex R objects", {
 })
 
 test_that("empty YAML front matter gets passed to parser", {
-  skip_if_not_installed("yaml12")
-
   text <- "---\n---\nBody"
   result <- parse_front_matter(text)
 

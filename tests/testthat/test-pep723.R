@@ -1,6 +1,4 @@
 test_that("valid PEP 723 block parses correctly", {
-  skip_if_not_installed("toml")
-
   text <- "# /// script
 # requires-python = \">=3.11\"
 # dependencies = [
@@ -20,8 +18,6 @@ import requests"
 })
 
 test_that("PEP 723 with bare # lines works", {
-  skip_if_not_installed("toml")
-
   text <- "# /// script
 # requires-python = \">=3.11\"
 #
@@ -37,8 +33,6 @@ import requests"
 })
 
 test_that("PEP 723 with CRLF works", {
-  skip_if_not_installed("toml")
-
   text <- "# /// script\r\n# name = \"test\"\r\n# ///\r\nimport sys"
   result <- parse_front_matter(text)
 
@@ -56,8 +50,6 @@ test_that("invalid PEP 723 opening is rejected", {
 })
 
 test_that("invalid PEP 723 content line is rejected", {
-  skip_if_not_installed("toml")
-
   # Line without # prefix
   text <- "# /// script\nrequires-python = \">=3.11\"\n# ///\nbody"
   result <- parse_front_matter(text)
@@ -75,8 +67,6 @@ test_that("PEP 723 missing closing delimiter", {
 })
 
 test_that("PEP 723 with tool sections works", {
-  skip_if_not_installed("toml")
-
   text <- "# /// script
 # requires-python = \">=3.11\"
 # [tool.my-runner]
@@ -92,8 +82,6 @@ import sys"
 })
 
 test_that("PEP 723 empty block works", {
-  skip_if_not_installed("toml")
-
   text <- "# /// script\n# ///\nimport sys"
   result <- parse_front_matter(text)
 
@@ -103,8 +91,6 @@ test_that("PEP 723 empty block works", {
 })
 
 test_that("PEP 723 ending without newline works", {
-  skip_if_not_installed("toml")
-
   text <- "# /// script\n# name = \"test\"\n# ///"
   result <- parse_front_matter(text)
 
@@ -113,8 +99,6 @@ test_that("PEP 723 ending without newline works", {
 })
 
 test_that("PEP 723 with trailing whitespace on delimiters", {
-  skip_if_not_installed("toml")
-
   text <- "# /// script   \n# name = \"test\"\n# ///   \nimport sys"
   result <- parse_front_matter(text)
 
@@ -141,8 +125,6 @@ test_that("PEP 723 requires exact closing format", {
 })
 
 test_that("PEP 723 line must start with # followed by space", {
-  skip_if_not_installed("toml")
-
   # Missing space after #
   text <- "# /// script\n#name = \"test\"\n# ///\nbody"
   result <- parse_front_matter(text)
@@ -153,8 +135,6 @@ test_that("PEP 723 line must start with # followed by space", {
 })
 
 test_that("PEP 723 doesn't conflict with standard formats", {
-  skip_if_not_installed("yaml12")
-
   # Standard YAML should still work
   text <- "---\ntitle: Test\n---\nBody"
   result <- parse_front_matter(text)

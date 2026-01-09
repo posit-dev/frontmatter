@@ -1,6 +1,4 @@
 test_that("large front matter is parsed correctly", {
-  skip_if_not_installed("yaml12")
-
   # Create large front matter (previously would have exceeded 1 MB limit)
   large_content <- paste(rep("x: value\n", 50000), collapse = "")
   text <- paste0("---\n", large_content, "---\nBody")
@@ -14,8 +12,6 @@ test_that("large front matter is parsed correctly", {
 })
 
 test_that("front matter with many lines is parsed correctly", {
-  skip_if_not_installed("yaml12")
-
   # Create front matter with many lines (previously would have exceeded 10K line limit)
   lines <- paste(rep("x: value\n", 11000), collapse = "")
   text <- paste0("---\n", lines, "---\nBody")
@@ -28,8 +24,6 @@ test_that("front matter with many lines is parsed correctly", {
 })
 
 test_that("large comment-wrapped front matter is parsed correctly", {
-  skip_if_not_installed("yaml12")
-
   # Create large comment-wrapped front matter
   lines <- paste(rep("# x: value\n", 11000), collapse = "")
   text <- paste0("# ---\n", lines, "# ---\nBody")
@@ -41,8 +35,6 @@ test_that("large comment-wrapped front matter is parsed correctly", {
 })
 
 test_that("large PEP 723 block is parsed correctly", {
-  skip_if_not_installed("toml")
-
   # Create large PEP 723 block with an array (TOML doesn't allow duplicate keys)
   # Each line must start with "# " for valid PEP 723
   array_items <- paste(rep("#   \"value\",\n", 11000), collapse = "")
@@ -71,8 +63,6 @@ test_that("document without front matter handles large content", {
 })
 
 test_that("empty front matter is parsed correctly", {
-  skip_if_not_installed("yaml12")
-
   text <- "---\n---\nBody"
   result <- parse_front_matter(text)
 

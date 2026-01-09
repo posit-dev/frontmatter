@@ -1,6 +1,4 @@
 test_that("read_front_matter handles UTF-8 with multibyte characters", {
-  skip_if_not_installed("yaml12")
-
   path <- test_path("fixtures", "yaml-utf8.md")
   result <- read_front_matter(path)
 
@@ -10,8 +8,6 @@ test_that("read_front_matter handles UTF-8 with multibyte characters", {
 })
 
 test_that("read_front_matter strips UTF-8 BOM", {
-  skip_if_not_installed("yaml12")
-
   path <- test_path("fixtures", "yaml-utf8-bom.md")
   result <- read_front_matter(path)
 
@@ -22,8 +18,6 @@ test_that("read_front_matter strips UTF-8 BOM", {
 })
 
 test_that("read_front_matter handles CRLF line endings", {
-  skip_if_not_installed("yaml12")
-
   path <- test_path("fixtures", "yaml-crlf.md")
   result <- read_front_matter(path)
 
@@ -48,8 +42,6 @@ test_that("read_front_matter handles empty file", {
 })
 
 test_that("parse_front_matter handles UTF-8 multibyte in content", {
-  skip_if_not_installed("yaml12")
-
   text <- "---\ntitle: \"日本語\"\n---\n\nBody: 中文内容"
   result <- parse_front_matter(text)
 

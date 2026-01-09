@@ -1,6 +1,4 @@
 test_that("parse_front_matter parses YAML correctly", {
-  skip_if_not_installed("yaml12")
-
   text <- "---\ntitle: Test\ndate: 2024-01-01\n---\nBody content"
   result <- parse_front_matter(text)
 
@@ -11,8 +9,6 @@ test_that("parse_front_matter parses YAML correctly", {
 })
 
 test_that("parse_front_matter parses TOML correctly", {
-  skip_if_not_installed("toml")
-
   text <- "+++\ntitle = \"Test\"\ncount = 42\n+++\nBody content"
   result <- parse_front_matter(text)
 
@@ -38,9 +34,13 @@ test_that("parse_front_matter handles empty documents", {
 })
 
 test_that("parse_front_matter handles documents with only front matter", {
-  skip_if_not_installed("yaml12")
-
   text <- "---\ntitle: Test\n---"
+  result <- parse_front_matter(text)
+
+  expect_equal(result$data$title, "Test")
+  expect_equal(result$body, "")
+
+  text <- "---\ntitle: Test\n---\n  \n  \n"
   result <- parse_front_matter(text)
 
   expect_equal(result$data$title, "Test")
@@ -52,8 +52,6 @@ test_that("parse_front_matter validates input", {
 })
 
 test_that("parse_front_matter accepts multi-element vectors", {
-  skip_if_not_installed("yaml12")
-
   # Multi-element vectors are joined with newlines (as from readLines())
   lines <- c("---", "title: Test", "---", "Body content")
   result <- parse_front_matter(lines)
@@ -77,8 +75,6 @@ test_that("parse_front_matter validates parser arguments", {
 })
 
 test_that("parse_front_matter handles multiline YAML", {
-  skip_if_not_installed("yaml12")
-
   text <- "---
 title: Test
 description: |
@@ -99,8 +95,6 @@ Content"
 })
 
 test_that("read_front_matter reads files correctly", {
-  skip_if_not_installed("yaml12")
-
   # Create a temporary file
   tmp <- tempfile(fileext = ".md")
   on.exit(unlink(tmp))
@@ -122,8 +116,6 @@ test_that("read_front_matter validates input", {
 })
 
 test_that("read_front_matter handles files with CRLF line endings", {
-  skip_if_not_installed("yaml12")
-
   tmp <- tempfile(fileext = ".md")
   on.exit(unlink(tmp))
 
@@ -139,8 +131,6 @@ test_that("read_front_matter handles files with CRLF line endings", {
 })
 
 test_that("read_front_matter handles files without trailing newline", {
-  skip_if_not_installed("yaml12")
-
   tmp <- tempfile(fileext = ".md")
   on.exit(unlink(tmp))
 

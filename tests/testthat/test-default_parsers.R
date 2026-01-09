@@ -10,8 +10,6 @@ test_that("YAML 1.1 option uses yaml package", {
 })
 
 test_that("YAML 1.2 option uses yaml12 package", {
-  skip_if_not_installed("yaml12")
-
   # YAML 1.2 treats 'yes' as string "yes"
   text <- "---\nvalue: yes\n---\nBody"
 
@@ -46,8 +44,6 @@ test_that("YAML spec envvar works when option not set", {
 
 test_that("YAML spec option takes precedence over envvar", {
   skip_if_not_installed("yaml")
-  skip_if_not_installed("yaml12")
-
   text <- "---\nvalue: yes\n---\nBody"
 
   # Option set to 1.2, envvar set to 1.1 - option should win
