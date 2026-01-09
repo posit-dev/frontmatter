@@ -194,7 +194,7 @@ str(parse_front_matter(text_yaml, parse_yaml = identity))
 # Use a custom parser that adds metadata
 custom_parser <- function(x) {
   data <- yaml12::parse_yaml(x)
-  data$parsed_at <- Sys.time()
+  data$.parsed_with <- "{frontmatter}"
   data
 }
 

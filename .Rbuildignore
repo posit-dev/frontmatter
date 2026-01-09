@@ -9,3 +9,5 @@
 ^\.covrignore$
 ^CLAUDE\.md$
 ^\.claude$
+^cran-comments\.md$
+^README\.html$
