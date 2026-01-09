@@ -189,19 +189,16 @@ str(parse_front_matter(text_py))
 
 ```{r}
 # Get raw YAML without parsing
-identity_parser <- front_matter_parsers(yaml = identity)
-str(parse_front_matter(text_yaml, parsers = identity_parser))
+str(parse_front_matter(text_yaml, parse_yaml = identity))
 
 # Use a custom parser that adds metadata
-metadata_parser <- front_matter_parsers(
-  yaml = function(x) {
-    data <- yaml12::parse_yaml(x)
-    data$parsed_at <- Sys.time()
-    data
-  }
-)
+custom_parser <- function(x) {
+  data <- yaml12::parse_yaml(x)
+  data$parsed_at <- Sys.time()
+  data
+}
 
-str(parse_front_matter(text_yaml, parsers = metadata_parser))
+str(parse_front_matter(text_yaml, parse_yaml = custom_parser))
 ```
 
 ## Default Parsers

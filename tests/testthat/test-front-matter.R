@@ -62,25 +62,17 @@ test_that("parse_front_matter accepts multi-element vectors", {
   expect_equal(result$body, "Body content")
 })
 
-test_that("parse_front_matter validates parsers argument", {
+test_that("parse_front_matter validates parser arguments", {
   text <- "---\ntitle: Test\n---\nBody"
 
   expect_error(
-    parse_front_matter(text, parsers = "invalid"),
-    "must be a list with elements"
+    parse_front_matter(text, parse_yaml = "not a function"),
+    "`parse_yaml` must be a function"
   )
 
   expect_error(
-    parse_front_matter(text, parsers = list(yaml = "not a function")),
-    "`yaml` must be a function"
-  )
-
-  expect_error(
-    parse_front_matter(
-      text,
-      parsers = list(yaml = identity, toml = "not a function")
-    ),
-    "must be a function"
+    parse_front_matter(text, parse_toml = "not a function"),
+    "`parse_toml` must be a function"
   )
 })
 

@@ -1,21 +1,8 @@
-test_that("front_matter_parsers creates parser list", {
-  skip_if_not_installed("yaml12")
-  skip_if_not_installed("toml")
-
-  parsers <- front_matter_parsers()
-
-  expect_type(parsers, "list")
-  expect_named(parsers, c("yaml", "toml"))
-  expect_type(parsers$yaml, "closure")
-  expect_type(parsers$toml, "closure")
-})
-
 test_that("custom YAML parser works", {
   text <- "---\nkey: value\n---\nBody"
 
   # Use identity to get raw string
-  parsers <- front_matter_parsers(yaml = identity)
-  result <- parse_front_matter(text, parsers = parsers)
+  result <- parse_front_matter(text, parse_yaml = identity)
 
   expect_equal(result$data, "key: value\n")
   expect_equal(result$body, "Body")
@@ -25,8 +12,7 @@ test_that("custom TOML parser works", {
   text <- "+++\nkey = \"value\"\n+++\nBody"
 
   # Use identity to get raw string
-  parsers <- front_matter_parsers(toml = identity)
-  result <- parse_front_matter(text, parsers = parsers)
+  result <- parse_front_matter(text, parse_toml = identity)
 
   expect_equal(result$data, "key = \"value\"\n")
   expect_equal(result$body, "Body")
@@ -36,12 +22,10 @@ test_that("both custom parsers can be specified", {
   text_yaml <- "---\nkey: value\n---\nYAML Body"
   text_toml <- "+++\nkey = \"value\"\n+++\nTOML Body"
 
-  parsers <- front_matter_parsers(yaml = identity, toml = identity)
-
-  result_yaml <- parse_front_matter(text_yaml, parsers = parsers)
+  result_yaml <- parse_front_matter(text_yaml, parse_yaml = identity)
   expect_equal(result_yaml$data, "key: value\n")
 
-  result_toml <- parse_front_matter(text_toml, parsers = parsers)
+  result_toml <- parse_front_matter(text_toml, parse_toml = identity)
   expect_equal(result_toml$data, "key = \"value\"\n")
 })
 
@@ -59,8 +43,7 @@ test_that("custom parser that transforms data works", {
     parsed
   }
 
-  parsers <- front_matter_parsers(yaml = custom_yaml)
-  result <- parse_front_matter(text, parsers = parsers)
+  result <- parse_front_matter(text, parse_yaml = custom_yaml)
 
   expect_equal(result$data$title, "TEST")
 })
@@ -73,10 +56,8 @@ test_that("parser errors propagate to user", {
     stop("Parse error: invalid YAML")
   }
 
-  parsers <- front_matter_parsers(yaml = failing_parser)
-
   expect_error(
-    parse_front_matter(text, parsers = parsers),
+    parse_front_matter(text, parse_yaml = failing_parser),
     "Parse error"
   )
 })
@@ -90,8 +71,7 @@ test_that("parsers can return NULL for empty front matter", {
     if (nchar(trimws(x)) == 0) NULL else x
   }
 
-  parsers <- front_matter_parsers(yaml = null_parser)
-  result <- parse_front_matter(text, parsers = parsers)
+  result <- parse_front_matter(text, parse_yaml = null_parser)
 
   expect_null(result$data)
   expect_equal(result$body, "Body")
@@ -107,8 +87,7 @@ test_that("parsers can return complex R objects", {
     obj
   }
 
-  parsers <- front_matter_parsers(yaml = custom_parser)
-  result <- parse_front_matter(text, parsers = parsers)
+  result <- parse_front_matter(text, parse_yaml = custom_parser)
 
   expect_s3_class(result$data, "custom_front_matter")
   expect_equal(result$data$raw, "key: value\n")

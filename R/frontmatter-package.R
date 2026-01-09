@@ -13,7 +13,6 @@
 #' @section Main Functions:
 #' * [parse_front_matter()]: Parse front matter from a string
 #' * [read_front_matter()]: Parse front matter from a file
-#' * [front_matter_parsers()]: Create custom parser configuration
 #'
 #' @section Performance:
 #' Uses C++11 for fast, single-pass parsing with minimal memory overhead.

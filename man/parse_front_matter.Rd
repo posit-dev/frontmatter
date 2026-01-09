@@ -5,17 +5,18 @@
 \alias{read_front_matter}
 \title{Parse YAML or TOML Front Matter}
 \usage{
-parse_front_matter(text, parsers = front_matter_parsers())
+parse_front_matter(text, parse_yaml = NULL, parse_toml = NULL)
 
-read_front_matter(path, parsers = front_matter_parsers())
+read_front_matter(path, parse_yaml = NULL, parse_toml = NULL)
 }
 \arguments{
 \item{text}{A character string or vector containing the document text. If a
 vector with multiple elements, they are joined with newlines (as from
 \code{readLines()}).}
 
-\item{parsers}{An optional list of parser functions created by
-\code{\link[=front_matter_parsers]{front_matter_parsers()}}. If \code{NULL}, default parsers are used.}
+\item{parse_yaml, parse_toml}{A function that takes a string and returns a
+parsed R object, or \code{NULL} to use the default parser. Use \code{identity} to
+return the raw string without parsing.}
 
 \item{path}{A character string specifying the path to a file. The file is
 assumed to be UTF-8 encoded. A UTF-8 BOM (byte order mark) at the start
@@ -44,6 +45,16 @@ functions return a list with the parsed front matter and the document body.
 \item \code{read_front_matter()}: Parse front matter from a file.
 
 }}
+\section{Custom Parsers}{
+
+
+By default, the package uses \code{\link[yaml12:parse_yaml]{yaml12::parse_yaml()}} for YAML and
+\code{\link[tomledit:read]{tomledit::parse_toml()}} for TOML. You can provide custom parser functions
+via \code{parse_yaml} and \code{parse_toml} to override these defaults.
+
+Use \code{identity} to return the raw YAML or TOML string without parsing.
+}
+
 \examples{
 # Parse YAML front matter
 text <- "---
@@ -66,9 +77,16 @@ Document content"
 result <- parse_front_matter(text)
 
 # Get raw YAML without parsing
+result <- parse_front_matter(text, parse_yaml = identity)
+
+# Use a custom parser that adds metadata
 result <- parse_front_matter(
   text,
-  parsers = front_matter_parsers(yaml = identity)
+  parse_yaml = function(x) {
+    data <- yaml12::parse_yaml(x)
+    data$parsed_at <- Sys.time()
+    data
+  }
 )
 
 # Or read from a file

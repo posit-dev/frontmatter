@@ -168,28 +168,25 @@ str(parse_front_matter(text_py))
 
 ``` r
 # Get raw YAML without parsing
-identity_parser <- front_matter_parsers(yaml = identity)
-str(parse_front_matter(text_yaml, parsers = identity_parser))
+str(parse_front_matter(text_yaml, parse_yaml = identity))
 #> List of 2
 #>  $ data: chr "title: My Document\ndate: 2024-01-01\ntags:\n  - tutorial\n  - R\n"
 #>  $ body: chr "Document content starts here."
 
 # Use a custom parser that adds metadata
-metadata_parser <- front_matter_parsers(
-  yaml = function(x) {
-    data <- yaml12::parse_yaml(x)
-    data$parsed_at <- Sys.time()
-    data
-  }
-)
+custom_parser <- function(x) {
+  data <- yaml12::parse_yaml(x)
+  data$parsed_at <- Sys.time()
+  data
+}
 
-str(parse_front_matter(text_yaml, parsers = metadata_parser))
+str(parse_front_matter(text_yaml, parse_yaml = custom_parser))
 #> List of 2
 #>  $ data:List of 4
 #>   ..$ title    : chr "My Document"
 #>   ..$ date     : chr "2024-01-01"
 #>   ..$ tags     : chr [1:2] "tutorial" "R"
-#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-09 08:52:49"
+#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-09 09:03:36"
 #>  $ body: chr "Document content starts here."
 ```
 

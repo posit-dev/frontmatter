@@ -6,6 +6,14 @@
 #' a character string, while `read_front_matter()` reads from a file. Both
 #' functions return a list with the parsed front matter and the document body.
 #'
+#' @section Custom Parsers:
+#'
+#' By default, the package uses [yaml12::parse_yaml()] for YAML and
+#' [tomledit::parse_toml()] for TOML. You can provide custom parser functions
+#' via `parse_yaml` and `parse_toml` to override these defaults.
+#'
+#' Use `identity` to return the raw YAML or TOML string without parsing.
+#'
 #' @examples
 #' # Parse YAML front matter
 #' text <- "---
@@ -28,9 +36,16 @@
 #' result <- parse_front_matter(text)
 #'
 #' # Get raw YAML without parsing
+#' result <- parse_front_matter(text, parse_yaml = identity)
+#'
+#' # Use a custom parser that adds metadata
 #' result <- parse_front_matter(
 #'   text,
-#'   parsers = front_matter_parsers(yaml = identity)
+#'   parse_yaml = function(x) {
+#'     data <- yaml12::parse_yaml(x)
+#'     data$parsed_at <- Sys.time()
+#'     data
+#'   }
 #' )
 #'
 #' # Or read from a file
@@ -42,8 +57,9 @@
 #' @param text A character string or vector containing the document text. If a
 #'   vector with multiple elements, they are joined with newlines (as from
 #'   `readLines()`).
-#' @param parsers An optional list of parser functions created by
-#'   [front_matter_parsers()]. If `NULL`, default parsers are used.
+#' @param parse_yaml,parse_toml A function that takes a string and returns a
+#'   parsed R object, or `NULL` to use the default parser. Use `identity` to
+#'   return the raw string without parsing.
 #'
 #' @return A named list with two elements:
 #'   - `data`: The parsed front matter as an R object, or `NULL` if no valid
@@ -53,20 +69,17 @@
 #'
 #' @describeIn parse_front_matter Parse front matter from text
 #' @export
-parse_front_matter <- function(text, parsers = front_matter_parsers()) {
+parse_front_matter <- function(text, parse_yaml = NULL, parse_toml = NULL) {
   check_character(text)
   if (length(text) > 1) {
     text <- paste0(text, collapse = "\n")
   }
 
-  if (!is.list(parsers)) {
-    rlang::abort(
-      "{.arg parsers} must be a list with elements {.val yaml} and {.val toml}.",
-      use_cli_format = TRUE
-    )
-  }
+  check_function(parse_yaml, allow_null = TRUE)
+  check_function(parse_toml, allow_null = TRUE)
 
-  parsers <- front_matter_parsers(yaml = parsers$yaml, toml = parsers$toml)
+  parse_yaml <- parse_yaml %||% default_yaml_parser
+  parse_toml <- parse_toml %||% default_toml_parser
 
   result <- extract_front_matter_cpp(text)
 
@@ -79,8 +92,8 @@ parse_front_matter <- function(text, parsers = front_matter_parsers()) {
 
   parsed_data <- switch(
     result$fence_type,
-    yaml = parsers$yaml(result$content),
-    toml = parsers$toml(result$content),
+    yaml = parse_yaml(result$content),
+    toml = parse_toml(result$content),
     NULL
   )
 
@@ -97,7 +110,7 @@ parse_front_matter <- function(text, parsers = front_matter_parsers()) {
 #'   of the file is automatically stripped if present.
 #'
 #' @export
-read_front_matter <- function(path, parsers = front_matter_parsers()) {
+read_front_matter <- function(path, parse_yaml = NULL, parse_toml = NULL) {
   check_string(path)
 
   if (!file.exists(path)) {
@@ -124,5 +137,5 @@ read_front_matter <- function(path, parsers = front_matter_parsers()) {
   text <- rawToChar(raw_bytes)
   Encoding(text) <- "UTF-8"
 
-  parse_front_matter(text, parsers = parsers)
+  parse_front_matter(text, parse_yaml = parse_yaml, parse_toml = parse_toml)
 }
