@@ -1,8 +1,8 @@
 #' Custom Front Matter Parsers
 #'
 #' Create a custom parser configuration for front matter parsing. By default,
-#' the package uses `yaml12::parse_yaml()` for YAML and `toml::parse_toml()` for
-#' TOML. You can provide custom parser functions to override these defaults.
+#' the package uses `yaml12::parse_yaml()` for YAML and `tomledit::parse_toml()`
+#' for TOML. You can provide custom parser functions to override these defaults.
 #'
 #' @param yaml,toml A function that takes a string and returns a parsed R
 #'   object, or `NULL` to use the default YAML or TOML parser. Use `identity` to
@@ -37,6 +37,13 @@ front_matter_parsers <- function(yaml = NULL, toml = NULL) {
 
   list(
     yaml = yaml %||% yaml12::parse_yaml,
-    toml = toml %||% toml::parse_toml
+    toml = toml %||% default_toml_parser
   )
+}
+
+default_toml_parser <- function(x) {
+  if (!nzchar(x)) {
+    return(NULL)
+  }
+  tomledit::from_toml(tomledit::parse_toml(x))
 }

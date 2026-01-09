@@ -17,8 +17,8 @@ functions.
 }
 \description{
 Create a custom parser configuration for front matter parsing. By default,
-the package uses \code{yaml12::parse_yaml()} for YAML and \code{toml::parse_toml()} for
-TOML. You can provide custom parser functions to override these defaults.
+the package uses \code{yaml12::parse_yaml()} for YAML and \code{tomledit::parse_toml()}
+for TOML. You can provide custom parser functions to override these defaults.
 }
 \examples{
 # Use default parsers

@@ -28,11 +28,12 @@ knitr::opts_chunk$set(
 
 - **Fast C++ parsing** for optimal performance
 - **Multiple formats supported:**
-  - Standard [YAML](https://posit-dev.github.io/r-yaml12/) (`---` delimiters)
-  - Standard [TOML](https://cran.r-project.org/package=toml) (`+++` delimiters)
+  - Standard [YAML](https://yaml.org/) (`---` delimiters)
+  - Standard [TOML](https://toml.io/en/) (`+++` delimiters)
   - Comment-wrapped formats for R and Python files (`#` and `#'` prefixes)
   - [PEP 723](https://peps.python.org/pep-0723/) Python [inline script metadata](https://packaging.python.org/en/latest/specifications/inline-script-metadata/#inline-script-metadata)
 - **Flexible parser integration** - use default parsers or provide your own
+  - Uses [yaml12](https://posit-dev.github.io/r-yaml12/) for [YAML 1.2 support](https://posit-dev.github.io/r-yaml12/articles/yaml-2-minute-intro.html)
 - **Graceful handling** of invalid front matter
 
 ## Installation
@@ -206,7 +207,7 @@ str(parse_front_matter(text_yaml, parsers = metadata_parser))
 ## Default Parsers
 
 - **YAML**: Uses `yaml12::parse_yaml()` with YAML 1.2 support
-- **TOML**: Uses `toml::parse_toml()`
+- **TOML**: Uses `tomledit::parse_toml()`
 
 ## Error Handling
 

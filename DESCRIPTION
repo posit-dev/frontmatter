@@ -17,7 +17,7 @@ BugReports: https://github.com/posit-dev/frontmatter/issues
 Imports:
     cpp11,
     rlang,
-    toml,
+    tomledit,
     yaml12
 Suggests:
     testthat (>= 3.0.0)
