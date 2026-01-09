@@ -7,3 +7,5 @@
 ^pkgdown$
 ^README\.Rmd$
 ^\.covrignore$
+^CLAUDE\.md$
+^\.claude$

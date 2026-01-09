@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(air:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(sed:*)",
+      "Skill(*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "mcp__r-btw__btw_tool_pkg_check",
+      "mcp__r-btw__btw_tool_pkg_document",
+      "mcp__r-btw__btw_tool_pkg_test"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -q '\\.R$'; then air format \"$file_path\"; fi; }"
+          }
+        ]
+      }
+    ]
+  }
+}
