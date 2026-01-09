@@ -45,11 +45,20 @@ You can install frontmatter from CRAN with:
 install.packages("frontmatter")
 ```
 
-You can install the development version of frontmatter from [GitHub](https://github.com/) with:
+To install the latest development version, you can install from [posit-dev.r-universe.dev](https://posit-dev.r-universe.dev/):
 
-``` r
+```r
 # install.packages("pak")
-pak::pak("posit-dev/frontmatter")
+
+pak::repo_add("https://posit-dev.r-universe.dev")
+pak::pak("frontmatter")
+```
+
+Or you can install the development version from [GitHub](https://github.com/posit-dev/frontmatter):
+
+```r
+# install.packages("pak")
+pak::pak("posit-dev/btw")
 ```
 
 ## Usage
