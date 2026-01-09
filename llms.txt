@@ -30,6 +30,12 @@ main content by delimiter fences.
 
 ## Installation
 
+You can install frontmatter from CRAN with:
+
+``` r
+install.packages("frontmatter")
+```
+
 You can install the development version of frontmatter from
 [GitHub](https://github.com/) with:
 
