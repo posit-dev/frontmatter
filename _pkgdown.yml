@@ -17,32 +17,35 @@ template:
     brand:
       color:
         palette:
-          # Core brand colors extracted from the image
-          cyan: "#00D9E1"        # Bright cyan from the left side energy burst
-          blue: "#2E7FD9"        # Deep blue from the negative charge sphere
-          indigo: "#4A5FD9"      # Bridging blue-purple spectrum
-          purple: "#7B4FD9"      # Purple transitioning from blue
-          pink: "#D94FA8"        # Pink-magenta midpoint
-          red: "#D9534F"         # Red transitioning to orange
-          orange: "#FF8C42"      # Vibrant orange from the positive charge sphere
-          yellow: "#FFD93D"      # Bright yellow from the center energy burst
-          green: "#72D963"       # Green (complementary balance)
-          teal: "#00C9B8"        # Teal between cyan and green
-          white: "#FFFFFF"       # Pure white from energy highlights
-          black: "#0A0F1A"       # Deep black from the background
-          gray: "#4A5568"        # Neutral gray for UI elements
+          # Bootstrap standard colors (creative names from extracted palette)
+          blue: "#2270BA"            # Matt Blue - rich blue from energy
+          indigo: "#3D5BA8"          # Interpolated between blue and purple
+          purple: "#6B4BA0"          # Purple complement
+          pink: "#D94FA8"            # Pink-magenta for spectrum
+          red: "#E8533F"             # Red transitioning to orange
+          orange: "#F16216"          # Light My Fire - vibrant orange from right burst
+          yellow: "#F0CD3C"          # Montezuma Gold - golden yellow from center
+          green: "#4AB87C"           # Green complement to balance warm colors
+          teal: "#3DBFB8"            # Teal between cyan and green
+          cyan: "#4ACFD3"            # Petrichor - cyan-turquoise from left burst
+          white: "#f8fcffff"
+          black: "#0e0a0e"           # Violet Void - deep purple-black background
+          gray: "#6B7280"            # Neutral gray
+          silent-snowfall: "#EBF5FC"  # Very light blue-white
+          light-blue-gray: "#E8F0F5"  # Light blue-gray for
+          violet-void: "#1F161E"      # Deep purple-black for dark backgrounds
 
         # Semantic colors using the palette
         foreground: black
         background: white
-        primary: cyan          # The striking cyan is the most distinctive brand color
+        primary: cyan                # petrichor - the striking cyan
         secondary: gray
-        tertiary: "#E2E8F0"    # Light gray for subtle backgrounds
+        tertiary: light-blue-gray          # Light blue-gray for subtle backgrounds
         success: green
         info: blue
         warning: yellow
-        danger: orange         # Using orange as it's prominent and energetic
-        light: white
+        danger: orange
+        light: silent-snowfall
         dark: black
 
       typography:
@@ -54,14 +57,15 @@ template:
         base: Source Sans Pro
         monospace: Source Code Pro
         link:
-          color: "1B7A7E"
+          color: "#1A6B8F"           # Darker cyan-blue for light backgrounds
 
     navbar-padding-y: 1rem
     pkgdown-nav-height: 72px
-    navbar-light-bg: "#fbeece"      # Very light cyan tint for light mode navbar
-    navbar-dark-bg: "#1e5baa"       # Deep black from the image background
-    code-color-dark: "#FF8C42"      # Vibrant orange for code in dark mode
-    code-bg: "#F0F9FA"              # Subtle cyan-tinted background for code blocks
-    link-color: "#1B7A7E"           # Darker teal-cyan for light backgrounds (good contrast)
-    link-color-dark: "#00D9E1"      # Bright cyan for dark backgrounds (high visibility)
+    navbar-light-bg: "oklch(1 0.1 42.82 / 1)"       # Warm light background (from montezuma-gold tint)
+    navbar-dark-bg: "#1F161E"        # violet-void
+    code-color-dark: "#ffab70"       # light-my-fire orange
+    code-bg: "#F7FCFD"               # Very subtle cyan tint
+    link-color: "#1A6B8F"            # Darker cyan-blue for readability on light
+    link-color-dark: "#4ACFD3"       # petrichor for dark backgrounds
+
 
