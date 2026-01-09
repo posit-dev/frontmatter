@@ -16,16 +16,16 @@ main content by delimiter fences.
 
 - **Fast C++ parsing** for optimal performance
 - **Multiple formats supported:**
-  - Standard [YAML](https://posit-dev.github.io/r-yaml12/) (`---`
-    delimiters)
-  - Standard [TOML](https://cran.r-project.org/package=toml) (`+++`
-    delimiters)
+  - Standard [YAML](https://yaml.org/) (`---` delimiters)
+  - Standard [TOML](https://toml.io/en/) (`+++` delimiters)
   - Comment-wrapped formats for R and Python files (`#` and `#'`
     prefixes)
   - [PEP 723](https://peps.python.org/pep-0723/) Python [inline script
     metadata](https://packaging.python.org/en/latest/specifications/inline-script-metadata/#inline-script-metadata)
 - **Flexible parser integration** - use default parsers or provide your
   own
+  - Uses [yaml12](https://posit-dev.github.io/r-yaml12/) for [YAML 1.2
+    support](https://posit-dev.github.io/r-yaml12/articles/yaml-2-minute-intro.html)
 - **Graceful handling** of invalid front matter
 
 ## Installation
@@ -158,28 +158,25 @@ str(parse_front_matter(text_py))
 
 ``` r
 # Get raw YAML without parsing
-identity_parser <- front_matter_parsers(yaml = identity)
-str(parse_front_matter(text_yaml, parsers = identity_parser))
+str(parse_front_matter(text_yaml, parse_yaml = identity))
 #> List of 2
 #>  $ data: chr "title: My Document\ndate: 2024-01-01\ntags:\n  - tutorial\n  - R\n"
 #>  $ body: chr "Document content starts here."
 
 # Use a custom parser that adds metadata
-metadata_parser <- front_matter_parsers(
-  yaml = function(x) {
-    data <- yaml12::parse_yaml(x)
-    data$parsed_at <- Sys.time()
-    data
-  }
-)
+custom_parser <- function(x) {
+  data <- yaml12::parse_yaml(x)
+  data$parsed_at <- Sys.time()
+  data
+}
 
-str(parse_front_matter(text_yaml, parsers = metadata_parser))
+str(parse_front_matter(text_yaml, parse_yaml = custom_parser))
 #> List of 2
 #>  $ data:List of 4
 #>   ..$ title    : chr "My Document"
 #>   ..$ date     : chr "2024-01-01"
 #>   ..$ tags     : chr [1:2] "tutorial" "R"
-#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-08 18:08:24"
+#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-09 09:51:28"
 #>  $ body: chr "Document content starts here."
 ```
 
@@ -189,11 +186,45 @@ str(parse_front_matter(text_yaml, parsers = metadata_parser))
   [`yaml12::parse_yaml()`](https://posit-dev.github.io/r-yaml12/reference/parse_yaml.html)
   with YAML 1.2 support
 - **TOML**: Uses
-  [`toml::parse_toml()`](https://rdrr.io/pkg/toml/man/toml.html)
+  [`tomledit::parse_toml()`](https://extendr.github.io/tomledit/reference/read.html)
+
+### YAML 1.1 Support
+
+To use YAML 1.1 parsing (via the [yaml](https://yaml.r-lib.org) package)
+instead of the default YAML 1.2, set either:
+
+- The R option: `options(frontmatter.parse_yaml.spec = "1.1")`
+- The environment variable: `FRONTMATTER_PARSE_YAML_SPEC=1.1`
+
+The option takes precedence over the environment variable.
+
+``` md
+---
+# In YAML 1.1, 'yes' is parsed as TRUE
+enabled: yes
+---
+
+Content
+```
+
+``` r
+# Default (YAML 1.2): 'yes' is a string
+parse_front_matter(text_yaml11)$data
+#> $enabled
+#> [1] "yes"
+
+# With YAML 1.1: 'yes' is boolean TRUE
+rlang::with_options(
+  frontmatter.parse_yaml.spec = "1.1",
+  parse_front_matter(text_yaml11)$data
+)
+#> $enabled
+#> [1] TRUE
+```
 
 ## Error Handling
 
-Invalid front matter returns `NULL` as data and the original content
+Incomplete front matter returns `NULL` as data and the original content
 unchanged:
 
 ``` r
@@ -204,7 +235,9 @@ str(parse_front_matter(text))
 #>  $ body: chr "---\nNot valid front matter"
 ```
 
-Parser errors propagate to the caller for proper error handling.
+Invalid front matter is handled by the parsing function. For example,
+invalid YAML will likely result in an error from the YAML parser. Use a
+custom parser if you need to handle such cases gracefully.
 
 ## Performance
 
@@ -216,12 +249,19 @@ The package uses C++11 for optimal performance:
 
 Designed for high throughput processing of many documents.
 
+## Acknowledgments
+
+This package was inspired by the
+[simplematter](https://github.com/remcohaszing/simplematter) JavaScript
+package.
+
+Thanks also to [Yihui Xie’s](https://yihui.org/) implementation in
+[`xfun::yaml_body()`](https://pkg.yihui.org/xfun/manual.html#sec:man-yaml_body).
+
 # Package index
 
 ## All functions
 
-- [`front_matter_parsers()`](https://posit-dev.github.io/frontmatter/reference/front_matter_parsers.md)
-  : Custom Front Matter Parsers
 - [`parse_front_matter()`](https://posit-dev.github.io/frontmatter/reference/parse_front_matter.md)
   [`read_front_matter()`](https://posit-dev.github.io/frontmatter/reference/parse_front_matter.md)
   : Parse YAML or TOML Front Matter

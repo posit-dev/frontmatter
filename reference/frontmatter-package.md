@@ -22,9 +22,6 @@ by fences.
 - [`read_front_matter()`](https://posit-dev.github.io/frontmatter/reference/parse_front_matter.md):
   Parse front matter from a file
 
-- [`front_matter_parsers()`](https://posit-dev.github.io/frontmatter/reference/front_matter_parsers.md):
-  Create custom parser configuration
-
 ## Performance
 
 Uses C++11 for fast, single-pass parsing with minimal memory overhead.

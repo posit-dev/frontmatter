@@ -10,9 +10,9 @@ with the parsed front matter and the document body.
 ## Usage
 
 ``` r
-parse_front_matter(text, parsers = front_matter_parsers())
+parse_front_matter(text, parse_yaml = NULL, parse_toml = NULL)
 
-read_front_matter(path, parsers = front_matter_parsers())
+read_front_matter(path, parse_yaml = NULL, parse_toml = NULL)
 ```
 
 ## Arguments
@@ -23,11 +23,11 @@ read_front_matter(path, parsers = front_matter_parsers())
   with multiple elements, they are joined with newlines (as from
   [`readLines()`](https://rdrr.io/r/base/readLines.html)).
 
-- parsers:
+- parse_yaml, parse_toml:
 
-  An optional list of parser functions created by
-  [`front_matter_parsers()`](https://posit-dev.github.io/frontmatter/reference/front_matter_parsers.md).
-  If `NULL`, default parsers are used.
+  A function that takes a string and returns a parsed R object, or
+  `NULL` to use the default parser. Use `identity` to return the raw
+  string without parsing.
 
 - path:
 
@@ -51,6 +51,36 @@ A named list with two elements:
 - `parse_front_matter()`: Parse front matter from text
 
 - `read_front_matter()`: Parse front matter from a file.
+
+## Custom Parsers
+
+By default, the package uses
+[`yaml12::parse_yaml()`](https://posit-dev.github.io/r-yaml12/reference/parse_yaml.html)
+for YAML and
+[`tomledit::parse_toml()`](https://extendr.github.io/tomledit/reference/read.html)
+for TOML. You can provide custom parser functions via `parse_yaml` and
+`parse_toml` to override these defaults.
+
+Use `identity` to return the raw YAML or TOML string without parsing.
+
+## YAML Specification Version
+
+The default YAML parser uses YAML 1.2 via
+[`yaml12::parse_yaml()`](https://posit-dev.github.io/r-yaml12/reference/parse_yaml.html).
+To use YAML 1.1 parsing instead (via
+[`yaml::yaml.load()`](https://yaml.r-lib.org/reference/yaml.load.html)),
+set either:
+
+- The R option `frontmatter.parse_yaml.spec` to `"1.1"`
+
+- The environment variable `FRONTMATTER_PARSE_YAML_SPEC` to `"1.1"`
+
+The option takes precedence over the environment variable. Valid values
+are `"1.1"` and `"1.2"` (the default).
+
+YAML 1.1 differs from YAML 1.2 in several ways, most notably in how it
+handles boolean values (e.g., `yes`/`no` are booleans in 1.1 but strings
+in 1.2).
 
 ## Examples
 
@@ -78,9 +108,16 @@ Document content"
 result <- parse_front_matter(text)
 
 # Get raw YAML without parsing
+result <- parse_front_matter(text, parse_yaml = identity)
+
+# Use a custom parser that adds metadata
 result <- parse_front_matter(
   text,
-  parsers = front_matter_parsers(yaml = identity)
+  parse_yaml = function(x) {
+    data <- yaml12::parse_yaml(x)
+    data$parsed_at <- Sys.time()
+    data
+  }
 )
 
 # Or read from a file

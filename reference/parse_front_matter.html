@@ -41,7 +41,7 @@ functions return a list with the parsed front matter and the document body."><me
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Parse YAML or TOML Front Matter</h1>
-      <small class="dont-index">Source: <a href="https://github.com/posit-dev/frontmatter/blob/main/R/front-matter.R" class="external-link"><code>R/front-matter.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/posit-dev/frontmatter/blob/main/R/parse_front_matter.R" class="external-link"><code>R/parse_front_matter.R</code></a></small>
       <div class="d-none name"><code>parse_front_matter.Rd</code></div>
     </div>
 
@@ -55,9 +55,9 @@ functions return a list with the parsed front matter and the document body.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">parse_front_matter</span><span class="op">(</span><span class="va">text</span>, parsers <span class="op">=</span> <span class="fu"><a href="front_matter_parsers.html">front_matter_parsers</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">parse_front_matter</span><span class="op">(</span><span class="va">text</span>, parse_yaml <span class="op">=</span> <span class="cn">NULL</span>, parse_toml <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">read_front_matter</span><span class="op">(</span><span class="va">path</span>, parsers <span class="op">=</span> <span class="fu"><a href="front_matter_parsers.html">front_matter_parsers</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">read_front_matter</span><span class="op">(</span><span class="va">path</span>, parse_yaml <span class="op">=</span> <span class="cn">NULL</span>, parse_toml <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -70,9 +70,10 @@ vector with multiple elements, they are joined with newlines (as from
 <code><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines()</a></code>).</p></dd>
 
 
-<dt id="arg-parsers">parsers<a class="anchor" aria-label="anchor" href="#arg-parsers"></a></dt>
-<dd><p>An optional list of parser functions created by
-<code><a href="front_matter_parsers.html">front_matter_parsers()</a></code>. If <code>NULL</code>, default parsers are used.</p></dd>
+<dt id="arg-parse-yaml-parse-toml">parse_yaml, parse_toml<a class="anchor" aria-label="anchor" href="#arg-parse-yaml-parse-toml"></a></dt>
+<dd><p>A function that takes a string and returns a
+parsed R object, or <code>NULL</code> to use the default parser. Use <code>identity</code> to
+return the raw string without parsing.</p></dd>
 
 
 <dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
@@ -94,6 +95,30 @@ lines removed. If no front matter is found, this is the original text.</p></li>
 <ul><li><p><code>parse_front_matter()</code>: Parse front matter from text</p></li>
 <li><p><code>read_front_matter()</code>: Parse front matter from a file.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="custom-parsers">Custom Parsers<a class="anchor" aria-label="anchor" href="#custom-parsers"></a></h2>
+
+
+
+<p>By default, the package uses <code><a href="https://posit-dev.github.io/r-yaml12/reference/parse_yaml.html" class="external-link">yaml12::parse_yaml()</a></code> for YAML and
+<code><a href="https://extendr.github.io/tomledit/reference/read.html" class="external-link">tomledit::parse_toml()</a></code> for TOML. You can provide custom parser functions
+via <code>parse_yaml</code> and <code>parse_toml</code> to override these defaults.</p>
+<p>Use <code>identity</code> to return the raw YAML or TOML string without parsing.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="yaml-specification-version">YAML Specification Version<a class="anchor" aria-label="anchor" href="#yaml-specification-version"></a></h2>
+
+
+
+<p>The default YAML parser uses YAML 1.2 via <code><a href="https://posit-dev.github.io/r-yaml12/reference/parse_yaml.html" class="external-link">yaml12::parse_yaml()</a></code>. To use
+YAML 1.1 parsing instead (via <code><a href="https://yaml.r-lib.org/reference/yaml.load.html" class="external-link">yaml::yaml.load()</a></code>), set either:</p><ul><li><p>The R option <code>frontmatter.parse_yaml.spec</code> to <code>"1.1"</code></p></li>
+<li><p>The environment variable <code>FRONTMATTER_PARSE_YAML_SPEC</code> to <code>"1.1"</code></p></li>
+</ul><p>The option takes precedence over the environment variable. Valid values are
+<code>"1.1"</code> and <code>"1.2"</code> (the default).</p>
+<p>YAML 1.1 differs from YAML 1.2 in several ways, most notably in how it
+handles boolean values (e.g., <code>yes</code>/<code>no</code> are booleans in 1.1 but strings
+in 1.2).</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -120,9 +145,16 @@ lines removed. If no front matter is found, this is the original text.</p></li>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">parse_front_matter</span><span class="op">(</span><span class="va">text</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Get raw YAML without parsing</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">parse_front_matter</span><span class="op">(</span><span class="va">text</span>, parse_yaml <span class="op">=</span> <span class="va">identity</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use a custom parser that adds metadata</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">parse_front_matter</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">text</span>,</span></span>
-<span class="r-in"><span>  parsers <span class="op">=</span> <span class="fu"><a href="front_matter_parsers.html">front_matter_parsers</a></span><span class="op">(</span>yaml <span class="op">=</span> <span class="va">identity</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  parse_yaml <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">yaml12</span><span class="fu">::</span><span class="fu"><a href="https://posit-dev.github.io/r-yaml12/reference/parse_yaml.html" class="external-link">parse_yaml</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">data</span><span class="op">$</span><span class="va">parsed_at</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">data</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Or read from a file</span></span></span>
