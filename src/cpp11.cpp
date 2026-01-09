@@ -5,7 +5,7 @@
 #include "cpp11/declarations.hpp"
 #include <R_ext/Visibility.h>
 
-// code.cpp
+// extract_front_matter.cpp
 list extract_front_matter_cpp(std::string text);
 extern "C" SEXP _frontmatter_extract_front_matter_cpp(SEXP text) {
   BEGIN_CPP11
