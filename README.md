@@ -186,7 +186,7 @@ str(parse_front_matter(text_yaml, parse_yaml = custom_parser))
 #>   ..$ title    : chr "My Document"
 #>   ..$ date     : chr "2024-01-01"
 #>   ..$ tags     : chr [1:2] "tutorial" "R"
-#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-09 09:42:09"
+#>   ..$ parsed_at: POSIXct[1:1], format: "2026-01-09 09:51:28"
 #>  $ body: chr "Document content starts here."
 ```
 
@@ -231,7 +231,7 @@ rlang::with_options(
 
 ## Error Handling
 
-Invalid front matter returns `NULL` as data and the original content
+Incomplete front matter returns `NULL` as data and the original content
 unchanged:
 
 ``` r
@@ -242,7 +242,9 @@ str(parse_front_matter(text))
 #>  $ body: chr "---\nNot valid front matter"
 ```
 
-Parser errors propagate to the caller for proper error handling.
+Invalid front matter is handled by the parsing function. For example,
+invalid YAML will likely result in an error from the YAML parser. Use a
+custom parser if you need to handle such cases gracefully.
 
 ## Performance
 
@@ -253,3 +255,12 @@ The package uses C++11 for optimal performance:
 - Efficient fence detection and validation
 
 Designed for high throughput processing of many documents.
+
+## Acknowledgments
+
+This package was inspired by the
+[simplematter](https://github.com/remcohaszing/simplematter) JavaScript
+package.
+
+Thanks also to [Yihui Xie’s](https://yihui.org/) implementation in
+[`xfun::yaml_body()`](https://pkg.yihui.org/xfun/manual.html#sec:man-yaml_body).
