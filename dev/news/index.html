@@ -39,7 +39,10 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="frontmatter-development-version">frontmatter (development version)<a class="anchor" aria-label="anchor" href="#frontmatter-development-version"></a></h2>
-</div>
+<ul><li><p>New <code><a href="../reference/format_front_matter.html">format_front_matter()</a></code> and <code><a href="../reference/format_front_matter.html">write_front_matter()</a></code> functions for serializing documents with YAML or TOML front matter. These are the inverse of <code><a href="../reference/parse_front_matter.html">parse_front_matter()</a></code> and <code><a href="../reference/parse_front_matter.html">read_front_matter()</a></code>, enabling full roundtrip support. Supports all delimiter formats including standard (<code>---</code>, <code>+++</code>), comment-wrapped (<code># ---</code>, <code>#' ---</code>), and PEP 723. Note that the roundtrip is not perfect; comments and formatting within the front matter content may not be preserved.</p></li>
+<li><p><code><a href="../reference/parse_front_matter.html">parse_front_matter()</a></code> and <code><a href="../reference/parse_front_matter.html">read_front_matter()</a></code> now attach <code>format</code> and <code>fence_type</code> as attributes to the returned list, making it easier to preserve the original format when rewriting documents.</p></li>
+<li><p>Fixed an issue with parsing front matter in comment-prefixed formats (e.g., R and Python files) where the body content was not preserved correctly. The body is now retained as-is, after stripping any leading comment-prefixed empty lines.</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="frontmatter-010">frontmatter 0.1.0<a class="anchor" aria-label="anchor" href="#frontmatter-010"></a></h2><p class="text-muted">CRAN release: 2026-01-14</p>
 <ul><li><p>Initial CRAN release.</p></li>
