@@ -143,3 +143,108 @@ test_that("read_front_matter handles files without trailing newline", {
   expect_equal(result$data$title, "Test")
   expect_equal(result$body, "Body")
 })
+
+# Comment-prefixed formats preserve body unchanged --------------------------
+
+test_that("parse_front_matter preserves body with # prefix (yaml_r format)", {
+  text <- "# ---
+# key: value
+# ---
+#
+# start of script
+print('hello')"
+
+  result <- parse_front_matter(text)
+
+  expect_equal(result$data$key, "value")
+  # Body should be returned unchanged, with # prefix preserved
+
+  expect_equal(result$body, "# start of script\nprint('hello')")
+})
+
+test_that("parse_front_matter preserves body with # prefix (toml_r format)", {
+  text <- "# +++
+# key = \"value\"
+# +++
+#
+# start of script
+print('hello')"
+
+  result <- parse_front_matter(text)
+
+  expect_equal(result$data$key, "value")
+  expect_equal(result$body, "# start of script\nprint('hello')")
+})
+
+test_that("parse_front_matter preserves body with #' prefix (yaml_roxy format)", {
+  text <- "#' ---
+#' key: value
+#' ---
+#'
+#' @description A function
+my_function <- function() {}"
+
+  result <- parse_front_matter(text)
+
+  expect_equal(result$data$key, "value")
+  expect_equal(
+    result$body,
+    "#' @description A function\nmy_function <- function() {}"
+  )
+})
+
+test_that("parse_front_matter preserves body with #' prefix (toml_roxy format)", {
+  text <- "#' +++
+#' key = \"value\"
+#' +++
+#'
+#' @description A function
+my_function <- function() {}"
+
+  result <- parse_front_matter(text)
+
+  expect_equal(result$data$key, "value")
+  expect_equal(
+    result$body,
+    "#' @description A function\nmy_function <- function() {}"
+  )
+})
+
+test_that("parse_front_matter preserves body in PEP 723 format", {
+  text <- "# /// script
+# dependencies = [\"requests\"]
+# ///
+#
+# A Python script
+import requests"
+
+  result <- parse_front_matter(text)
+
+  # TOML arrays are parsed as nested lists by tomledit
+  expect_equal(result$data$dependencies[[1]], "requests")
+  expect_equal(result$body, "# A Python script\nimport requests")
+})
+
+test_that("parse_front_matter handles comment format without separator line", {
+  # No blank # line between closing fence and body
+  text <- "# ---
+# key: value
+# ---
+# start of script"
+
+  result <- parse_front_matter(text)
+
+  expect_equal(result$data$key, "value")
+  expect_equal(result$body, "# start of script")
+})
+
+test_that("parse_front_matter handles comment format with empty body", {
+  text <- "# ---
+# key: value
+# ---"
+
+  result <- parse_front_matter(text)
+
+  expect_equal(result$data$key, "value")
+  expect_equal(result$body, "")
+})

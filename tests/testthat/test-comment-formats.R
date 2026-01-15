@@ -25,7 +25,8 @@ test_that("Roxygen #' comment-wrapped YAML works", {
   expect_false(is.null(result$data))
   expect_equal(result$data$title, "Test")
   expect_equal(result$data$author, "Someone")
-  expect_equal(result$body, "Body content")
+  # Body is preserved unchanged (including #' prefix)
+  expect_equal(result$body, "#' Body content")
 })
 
 test_that("Roxygen #' comment-wrapped TOML works", {
@@ -35,7 +36,8 @@ test_that("Roxygen #' comment-wrapped TOML works", {
   expect_false(is.null(result$data))
   expect_equal(result$data$title, "Test")
   expect_equal(result$data$count, 99)
-  expect_equal(result$body, "Body content")
+  # Body is preserved unchanged (including #' prefix)
+  expect_equal(result$body, "#' Body content")
 })
 
 test_that("comment-wrapped with empty comment lines works", {

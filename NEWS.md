@@ -1,5 +1,7 @@
 # frontmatter (development version)
 
+* Fixed an issue with parsing front matter in comment-prefixed formats (e.g., R and Python files) where the body content was not preserved correctly. The body is now retained as-is, after stripping any leading comment-prefixed empty lines.
+
 # frontmatter 0.1.0
 
 * Initial CRAN release.
