@@ -1,5 +1,9 @@
 # frontmatter (development version)
 
+* New `format_front_matter()` and `write_front_matter()` functions for serializing documents with YAML or TOML front matter. These are the inverse of `parse_front_matter()` and `read_front_matter()`, enabling full roundtrip support. Supports all delimiter formats including standard (`---`, `+++`), comment-wrapped (`# ---`, `#' ---`), and PEP 723. Note that the roundtrip is not perfect; comments and formatting within the front matter content may not be preserved.
+
+* `parse_front_matter()` and `read_front_matter()` now attach `format` and `fence_type` as attributes to the returned list, making it easier to preserve the original format when rewriting documents.
+
 * Fixed an issue with parsing front matter in comment-prefixed formats (e.g., R and Python files) where the body content was not preserved correctly. The body is now retained as-is, after stripping any leading comment-prefixed empty lines.
 
 # frontmatter 0.1.0

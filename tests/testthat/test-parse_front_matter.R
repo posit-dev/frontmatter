@@ -2,6 +2,8 @@ test_that("parse_front_matter parses YAML correctly", {
   text <- "---\ntitle: Test\ndate: 2024-01-01\n---\nBody content"
   result <- parse_front_matter(text)
 
+  expect_snapshot(print(result))
+
   expect_false(is.null(result$data))
   expect_equal(result$data$title, "Test")
   expect_equal(result$data$date, "2024-01-01")
@@ -11,6 +13,8 @@ test_that("parse_front_matter parses YAML correctly", {
 test_that("parse_front_matter parses TOML correctly", {
   text <- "+++\ntitle = \"Test\"\ncount = 42\n+++\nBody content"
   result <- parse_front_matter(text)
+
+  expect_snapshot(print(result))
 
   expect_false(is.null(result$data))
   expect_equal(result$data$title, "Test")
@@ -146,7 +150,7 @@ test_that("read_front_matter handles files without trailing newline", {
 
 # Comment-prefixed formats preserve body unchanged --------------------------
 
-test_that("parse_front_matter preserves body with # prefix (yaml_r format)", {
+test_that("parse_front_matter preserves body with # prefix (yaml_comment format)", {
   text <- "# ---
 # key: value
 # ---
@@ -162,7 +166,7 @@ print('hello')"
   expect_equal(result$body, "# start of script\nprint('hello')")
 })
 
-test_that("parse_front_matter preserves body with # prefix (toml_r format)", {
+test_that("parse_front_matter preserves body with # prefix (toml_comment format)", {
   text <- "# +++
 # key = \"value\"
 # +++
@@ -247,4 +251,70 @@ test_that("parse_front_matter handles comment format with empty body", {
 
   expect_equal(result$data$key, "value")
   expect_equal(result$body, "")
+})
+
+# Format and fence_type attributes ------------------------------------------
+
+test_that("standard YAML returns format='yaml', fence_type='yaml'", {
+  text <- "---\ntitle: Test\n---\nBody"
+  result <- parse_front_matter(text)
+
+  expect_equal(attr(result, "format"), "yaml")
+  expect_equal(attr(result, "fence_type"), "yaml")
+})
+
+test_that("standard TOML returns format='toml', fence_type='toml'", {
+  text <- "+++\ntitle = \"Test\"\n+++\nBody"
+  result <- parse_front_matter(text)
+
+  expect_equal(attr(result, "format"), "toml")
+  expect_equal(attr(result, "fence_type"), "toml")
+})
+
+test_that("comment-wrapped YAML returns format='yaml', fence_type='yaml_comment'", {
+  text <- "# ---\n# title: Test\n# ---\nBody"
+  result <- parse_front_matter(text)
+
+  expect_equal(attr(result, "format"), "yaml")
+  expect_equal(attr(result, "fence_type"), "yaml_comment")
+})
+
+test_that("comment-wrapped TOML returns format='toml', fence_type='toml_comment'", {
+  text <- "# +++\n# title = \"Test\"\n# +++\nBody"
+  result <- parse_front_matter(text)
+
+  expect_equal(attr(result, "format"), "toml")
+  expect_equal(attr(result, "fence_type"), "toml_comment")
+})
+
+test_that("roxygen YAML returns format='yaml', fence_type='yaml_roxy'", {
+  text <- "#' ---\n#' title: Test\n#' ---\nBody"
+  result <- parse_front_matter(text)
+
+  expect_equal(attr(result, "format"), "yaml")
+  expect_equal(attr(result, "fence_type"), "yaml_roxy")
+})
+
+test_that("roxygen TOML returns format='toml', fence_type='toml_roxy'", {
+  text <- "#' +++\n#' title = \"Test\"\n#' +++\nBody"
+  result <- parse_front_matter(text)
+
+  expect_equal(attr(result, "format"), "toml")
+  expect_equal(attr(result, "fence_type"), "toml_roxy")
+})
+
+test_that("PEP 723 returns format='toml', fence_type='toml_pep723'", {
+  text <- "# /// script\n# dependencies = [\"requests\"]\n# ///\nBody"
+  result <- parse_front_matter(text)
+
+  expect_equal(attr(result, "format"), "toml")
+  expect_equal(attr(result, "fence_type"), "toml_pep723")
+})
+
+test_that("no front matter returns NULL attributes", {
+  text <- "Just content\nNo front matter"
+  result <- parse_front_matter(text)
+
+  expect_null(attr(result, "format"))
+  expect_null(attr(result, "fence_type"))
 })

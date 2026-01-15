@@ -392,6 +392,7 @@ list extract_pep723(const std::string& text) {
   // Check for opening at position 0
   if (!is_pep723_opening(str, 0, len)) {
     result.push_back({"found"_nm = false});
+    result.push_back({"format"_nm = "none"});
     result.push_back({"fence_type"_nm = "none"});
     result.push_back({"content"_nm = ""});
     result.push_back({"body"_nm = text});
@@ -424,7 +425,8 @@ list extract_pep723(const std::string& text) {
       }
 
       result.push_back({"found"_nm = true});
-      result.push_back({"fence_type"_nm = "toml"});
+      result.push_back({"format"_nm = "toml"});
+      result.push_back({"fence_type"_nm = "toml_pep723"});
       result.push_back({"content"_nm = content});
       result.push_back({"body"_nm = body});
       return result;
@@ -434,6 +436,7 @@ list extract_pep723(const std::string& text) {
     if (str[pos] != '#') {
       // Invalid PEP 723 block
       result.push_back({"found"_nm = false});
+      result.push_back({"format"_nm = "none"});
       result.push_back({"fence_type"_nm = "none"});
       result.push_back({"content"_nm = ""});
       result.push_back({"body"_nm = text});
@@ -444,6 +447,7 @@ list extract_pep723(const std::string& text) {
     if (pos + 1 < len && str[pos + 1] != '\n' && str[pos + 1] != '\r' && str[pos + 1] != ' ') {
       // Invalid: no space after #
       result.push_back({"found"_nm = false});
+      result.push_back({"format"_nm = "none"});
       result.push_back({"fence_type"_nm = "none"});
       result.push_back({"content"_nm = ""});
       result.push_back({"body"_nm = text});
@@ -456,6 +460,7 @@ list extract_pep723(const std::string& text) {
 
   // No closing delimiter found
   result.push_back({"found"_nm = false});
+  result.push_back({"format"_nm = "none"});
   result.push_back({"fence_type"_nm = "none"});
   result.push_back({"content"_nm = ""});
   result.push_back({"body"_nm = text});
@@ -472,6 +477,7 @@ list extract_front_matter_cpp(std::string text) {
   // Empty string
   if (len == 0) {
     result.push_back({"found"_nm = false});
+    result.push_back({"format"_nm = "none"});
     result.push_back({"fence_type"_nm = "none"});
     result.push_back({"content"_nm = ""});
     result.push_back({"body"_nm = ""});
@@ -485,6 +491,7 @@ list extract_front_matter_cpp(std::string text) {
 
   // Check for opening fence at position 0
   const char* fence_chars = nullptr;
+  std::string format;
   std::string fence_type;
   const char* comment_prefix = nullptr;
   size_t opening_end = 0;
@@ -500,7 +507,13 @@ list extract_front_matter_cpp(std::string text) {
     }
     if (check_pos >= len || is_newline(str, check_pos, len)) {
       fence_chars = "---";
-      fence_type = "yaml";
+      format = "yaml";
+      // Determine fence_type based on prefix: "# " -> yaml_comment, "#' " -> yaml_roxy
+      if (strcmp(comment_prefix, "# ") == 0) {
+        fence_type = "yaml_comment";
+      } else {
+        fence_type = "yaml_roxy";
+      }
       is_comment_wrapped = true;
       opening_end = skip_to_next_line(str, 0, len);
     }
@@ -516,7 +529,13 @@ list extract_front_matter_cpp(std::string text) {
       }
       if (check_pos >= len || is_newline(str, check_pos, len)) {
         fence_chars = "+++";
-        fence_type = "toml";
+        format = "toml";
+        // Determine fence_type based on prefix: "# " -> toml_comment, "#' " -> toml_roxy
+        if (strcmp(comment_prefix, "# ") == 0) {
+          fence_type = "toml_comment";
+        } else {
+          fence_type = "toml_roxy";
+        }
         is_comment_wrapped = true;
         opening_end = skip_to_next_line(str, 0, len);
       }
@@ -528,6 +547,7 @@ list extract_front_matter_cpp(std::string text) {
     opening_end = validate_fence(str, 0, len, "---", true);
     if (opening_end > 0) {
       fence_chars = "---";
+      format = "yaml";
       fence_type = "yaml";
     }
   }
@@ -537,6 +557,7 @@ list extract_front_matter_cpp(std::string text) {
     opening_end = validate_fence(str, 0, len, "+++", true);
     if (opening_end > 0) {
       fence_chars = "+++";
+      format = "toml";
       fence_type = "toml";
     }
   }
@@ -544,6 +565,7 @@ list extract_front_matter_cpp(std::string text) {
   // No valid opening fence found
   if (!fence_chars) {
     result.push_back({"found"_nm = false});
+    result.push_back({"format"_nm = "none"});
     result.push_back({"fence_type"_nm = "none"});
     result.push_back({"content"_nm = ""});
     result.push_back({"body"_nm = text});
@@ -563,6 +585,7 @@ list extract_front_matter_cpp(std::string text) {
   if (closing_start == 0) {
     // No valid closing fence found or limits exceeded
     result.push_back({"found"_nm = false});
+    result.push_back({"format"_nm = "none"});
     result.push_back({"fence_type"_nm = "none"});
     result.push_back({"content"_nm = ""});
     result.push_back({"body"_nm = text});
@@ -593,6 +616,7 @@ list extract_front_matter_cpp(std::string text) {
   }
 
   result.push_back({"found"_nm = true});
+  result.push_back({"format"_nm = format});
   result.push_back({"fence_type"_nm = fence_type});
   result.push_back({"content"_nm = content});
   result.push_back({"body"_nm = body});
