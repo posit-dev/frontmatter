@@ -1,7 +1,7 @@
 url: https://posit-dev.github.io/frontmatter/
 
-# development:
-#   mode: auto
+development:
+  mode: auto
 
 authors:
   Garrick Aden-Buie:
