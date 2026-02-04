@@ -130,22 +130,17 @@ print.front_matter <- function(x, ...) {
     attr(x, "fence_type")
   ))
 
-  cat_h2("Data")
-  print(x$data)
-  cat_h2("Body")
+  cat_h2("$data")
+  str(x$data)
+  cat("\n")
+  cat_h2("$body")
   cat(x$body, "\n")
   invisible(x)
 }
 
 cat_h2 <- function(x) {
-  cat(
-    strrep("\u2500", 4),
-    " ",
-    x,
-    strrep("\u2500", 4),
-    "\n",
-    sep = ""
-  )
+  line <- strrep("\u2500", 4)
+  cat(sprintf("%s %s %s\n", line, x, line))
 }
 
 #' @describeIn parse_front_matter Parse front matter from a file.
