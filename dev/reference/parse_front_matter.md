@@ -126,14 +126,12 @@ writeLines(text, tmpfile)
 
 read_front_matter(tmpfile)
 #> <front_matter format="toml", delimiter="toml">
-#> ──── Data────
-#> $title
-#> [1] "My Document"
+#> ──── $data ────
+#> List of 2
+#>  $ title: chr "My Document"
+#>  $ date : chr "2024-01-01"
 #> 
-#> $date
-#> [1] "2024-01-01"
-#> 
-#> ──── Body────
+#> ──── $body ────
 #> Document content
 #>  
 ```

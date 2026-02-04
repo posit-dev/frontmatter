@@ -168,7 +168,7 @@ format_front_matter(doc)
 tmp <- tempfile(fileext = ".md")
 write_front_matter(doc, tmp)
 readLines(tmp)
-#> Warning: incomplete final line found on '/tmp/RtmpIKO3l5/file1b274c1bc3e6.md'
+#> Warning: incomplete final line found on '/tmp/Rtmpxp7Sva/file1c16b3cc88d.md'
 #> [1] "---"                         "title: My Document"         
 #> [3] "author: Jane Doe"            "---"                        
 #> [5] ""                            "Document content goes here."
