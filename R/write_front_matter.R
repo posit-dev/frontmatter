@@ -192,7 +192,15 @@ format_front_matter <- function(
     )
   }
 
-  paste(lines, collapse = "\n")
+  lines <- paste(lines, collapse = "\n")
+
+  # Ensure trailing newline (matching writeLines() convention)
+  # Only add a newline if the content doesn't already end with one
+  if (nzchar(lines) && substring(lines, nchar(lines)) != "\n") {
+    lines <- paste0(lines, "\n")
+  }
+
+  lines
 }
 
 #' @describeIn format_front_matter Write front matter to a file or console

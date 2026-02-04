@@ -3,7 +3,8 @@ test_that("CRLF line endings preserved in body", {
   result <- parse_front_matter(text)
 
   expect_equal(result$data$title, "Test")
-  expect_equal(result$body, "Body\r\n")
+  # Trailing \r\n is stripped (matching readLines() convention)
+  expect_equal(result$body, "Body")
 })
 
 test_that("LF line endings work", {
@@ -11,7 +12,8 @@ test_that("LF line endings work", {
   result <- parse_front_matter(text)
 
   expect_equal(result$data$title, "Test")
-  expect_equal(result$body, "Body\n")
+  # Trailing newline is stripped (matching readLines() convention)
+  expect_equal(result$body, "Body")
 })
 
 test_that("mixed line endings work", {

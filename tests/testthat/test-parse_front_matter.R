@@ -111,7 +111,8 @@ test_that("read_front_matter reads files correctly", {
   result <- read_front_matter(tmp)
 
   expect_equal(result$data$title, "Test")
-  expect_equal(result$body, "Body\n")
+  # Trailing newline is stripped (matching readLines() convention)
+  expect_equal(result$body, "Body")
 })
 
 test_that("read_front_matter validates input", {
@@ -131,7 +132,8 @@ test_that("read_front_matter handles files with CRLF line endings", {
   result <- read_front_matter(tmp)
 
   expect_equal(result$data$title, "Test")
-  expect_equal(result$body, "Body\r\n")
+  # Trailing \r\n is stripped (matching readLines() convention)
+  expect_equal(result$body, "Body")
 })
 
 test_that("read_front_matter handles files without trailing newline", {

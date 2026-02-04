@@ -112,9 +112,24 @@ parse_front_matter <- function(text, parse_yaml = NULL, parse_toml = NULL) {
     NULL
   )
 
+  # Strip trailing newline from body to match readLines() convention
+  # format_front_matter() adds a trailing newline, so parse_front_matter()
+  # strips it. Strip \n or \r\n (CRLF), but not bare \r
+  body <- result$body
+  if (!is.null(body) && nzchar(body)) {
+    if (substring(body, nchar(body)) == "\n") {
+      body <- substring(body, 1, nchar(body) - 1)
+
+      # Handle CRLF: trailing \n proceeded by \r
+      if (nzchar(body) && substring(body, nchar(body)) == "\r") {
+        body <- substring(body, 1, nchar(body) - 1)
+      }
+    }
+  }
+
   ret <- list(
     data = parsed_data,
-    body = result$body
+    body = body
   )
   attr(ret, "format") <- result$format
   attr(ret, "fence_type") <- result$fence_type
