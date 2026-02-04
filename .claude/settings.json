@@ -12,7 +12,6 @@
       "mcp__r-btw__btw_tool_pkg_document",
       "mcp__r-btw__btw_tool_pkg_test",
       "Bash(Rscript:*)",
-      "mcp__r-btw__btw_tool_session_check_package_installed",
       "Bash(gh issue view:*)",
       "Skill(r-lib:*)"
     ]
