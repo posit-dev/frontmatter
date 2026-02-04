@@ -101,6 +101,62 @@ str(parse_front_matter(text_yaml))
 result <- read_front_matter("document.md")
 ```
 
+### Write Front Matter
+
+The `format_front_matter()` and `write_front_matter()` functions are the **inverse** of `parse_front_matter()` and `read_front_matter()`. They serialize R data structures back to front matter format, enabling you to programmatically create or modify documents with front matter.
+
+#### Basic Writing
+
+```{r}
+# Create a document structure
+doc <- list(
+  data = list(title = "My Document", author = "Jane Doe"),
+  body = "Document content goes here."
+)
+
+# Format as a string
+format_front_matter(doc)
+
+# Write to a file
+tmp <- tempfile(fileext = ".md")
+write_front_matter(doc, tmp)
+readLines(tmp)
+
+# Print to console (when path is NULL)
+write_front_matter(doc, path = NULL)
+```
+
+#### Roundtrip Modification
+
+```{r}
+# Start with the text_yaml variable from earlier
+doc <- parse_front_matter(text_yaml)
+
+# Modify the data
+doc$data$title <- "Modified Title"
+doc$data$author <- "New Author"
+
+# Format back to string
+format_front_matter(doc)
+```
+
+#### Format Options
+
+All delimiter formats supported in parsing are available for writing. Use these shortcuts with the `delimiter` argument:
+
+- `"yaml"` - Standard YAML (`---`)
+- `"toml"` - Standard TOML (`+++`)
+- `"yaml_comment"` / `"toml_comment"` - Comment-wrapped for scripts (`# ---` / `# +++`)
+- `"yaml_roxy"` / `"toml_roxy"` - Roxygen-style (`#' ---` / `#' +++`)
+- `"toml_pep723"` - Python PEP 723 (`# /// script`)
+
+See the parsing examples earlier in this README to understand what each format looks like. Here's a quick example with TOML:
+
+```{r}
+# Use TOML format
+format_front_matter(doc, delimiter = "toml")
+```
+
 ### TOML Front Matter
 
 ```md
@@ -219,8 +275,8 @@ str(parse_front_matter(text_yaml, parse_yaml = custom_parser))
 
 ## Default Parsers
 
-- **YAML**: Uses `yaml12::parse_yaml()` with YAML 1.2 support
-- **TOML**: Uses `tomledit::parse_toml()`
+- **YAML**: Uses `yaml12::parse_yaml()` with YAML 1.2 support for parsing, and `yaml12::format_yaml()` for serialization
+- **TOML**: Uses `tomledit::parse_toml()` for parsing, and `tomledit::to_toml()` for serialization
 
 ### YAML 1.1 Support
 

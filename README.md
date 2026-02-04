@@ -90,12 +90,91 @@ str(parse_front_matter(text_yaml))
 #>   ..$ date : chr "2024-01-01"
 #>   ..$ tags : chr [1:2] "tutorial" "R"
 #>  $ body: chr "Document content starts here."
+#>  - attr(*, "format")= chr "yaml"
+#>  - attr(*, "fence_type")= chr "yaml"
+#>  - attr(*, "class")= chr "front_matter"
 ```
 
 ### Parse from File
 
 ``` r
 result <- read_front_matter("document.md")
+```
+
+### Write Front Matter
+
+The `format_front_matter()` and `write_front_matter()` functions are the
+**inverse** of `parse_front_matter()` and `read_front_matter()`. They
+serialize R data structures back to front matter format, enabling you to
+programmatically create or modify documents with front matter.
+
+#### Basic Writing
+
+``` r
+# Create a document structure
+doc <- list(
+  data = list(title = "My Document", author = "Jane Doe"),
+  body = "Document content goes here."
+)
+
+# Format as a string
+format_front_matter(doc)
+#> [1] "---\ntitle: My Document\nauthor: Jane Doe\n---\n\nDocument content goes here."
+
+# Write to a file
+tmp <- tempfile(fileext = ".md")
+write_front_matter(doc, tmp)
+readLines(tmp)
+#> Warning in readLines(tmp): incomplete final line found on
+#> '/var/folders/kd/hwcg76bs58qbx5vghj3jrkvh0000gp/T//RtmpbRBh2m/filea26952be55d3.md'
+#> [1] "---"                         "title: My Document"         
+#> [3] "author: Jane Doe"            "---"                        
+#> [5] ""                            "Document content goes here."
+
+# Print to console (when path is NULL)
+write_front_matter(doc, path = NULL)
+#> ---
+#> title: My Document
+#> author: Jane Doe
+#> ---
+#> 
+#> Document content goes here.
+```
+
+#### Roundtrip Modification
+
+``` r
+# Start with the text_yaml variable from earlier
+doc <- parse_front_matter(text_yaml)
+
+# Modify the data
+doc$data$title <- "Modified Title"
+doc$data$author <- "New Author"
+
+# Format back to string
+format_front_matter(doc)
+#> [1] "---\ntitle: Modified Title\ndate: 2024-01-01\ntags:\n  - tutorial\n  - R\nauthor: New Author\n---\n\nDocument content starts here."
+```
+
+#### Format Options
+
+All delimiter formats supported in parsing are available for writing.
+Use these shortcuts with the `delimiter` argument:
+
+- `"yaml"` - Standard YAML (`---`)
+- `"toml"` - Standard TOML (`+++`)
+- `"yaml_comment"` / `"toml_comment"` - Comment-wrapped for scripts
+  (`# ---` / `# +++`)
+- `"yaml_roxy"` / `"toml_roxy"` - Roxygen-style (`#' ---` / `#' +++`)
+- `"toml_pep723"` - Python PEP 723 (`# /// script`)
+
+See the parsing examples earlier in this README to understand what each
+format looks like. Here’s a quick example with TOML:
+
+``` r
+# Use TOML format
+format_front_matter(doc, delimiter = "toml")
+#> [1] "+++\ntitle = \"Modified Title\"\ndate = \"2024-01-01\"\ntags = [\"tutorial\", \"R\"]\nauthor = \"New Author\"\n+++\n\nDocument content starts here."
 ```
 
 ### TOML Front Matter
@@ -116,6 +195,9 @@ str(parse_front_matter(text_toml))
 #>   ..$ title: chr "My Document"
 #>   ..$ count: int 42
 #>  $ body: chr "Content here"
+#>  - attr(*, "format")= chr "toml"
+#>  - attr(*, "fence_type")= chr "toml"
+#>  - attr(*, "class")= chr "front_matter"
 ```
 
 ### Comment-Wrapped Formats
@@ -139,6 +221,9 @@ str(parse_front_matter(text_r))
 #>   ..$ title : chr "My Analysis"
 #>   ..$ author: chr "Data Scientist"
 #>  $ body: chr "library(dplyr)\n# Analysis code..."
+#>  - attr(*, "format")= chr "yaml"
+#>  - attr(*, "fence_type")= chr "yaml_comment"
+#>  - attr(*, "class")= chr "front_matter"
 ```
 
 Roxygen-style comments are also supported:
@@ -156,7 +241,10 @@ str(parse_front_matter(text_roxy))
 #> List of 2
 #>  $ data:List of 1
 #>   ..$ title: chr "My Function"
-#>  $ body: chr "Documentation here"
+#>  $ body: chr "#' Documentation here"
+#>  - attr(*, "format")= chr "yaml"
+#>  - attr(*, "fence_type")= chr "yaml_roxy"
+#>  - attr(*, "class")= chr "front_matter"
 ```
 
 ### PEP 723 Python Metadata
@@ -180,6 +268,9 @@ str(parse_front_matter(text_py))
 #>   ..$ dependencies   :List of 1
 #>   .. ..$ : chr "requests<3"
 #>  $ body: chr "import requests"
+#>  - attr(*, "format")= chr "toml"
+#>  - attr(*, "fence_type")= chr "toml_pep723"
+#>  - attr(*, "class")= chr "front_matter"
 ```
 
 ### Custom Parsers
@@ -190,6 +281,9 @@ str(parse_front_matter(text_yaml, parse_yaml = identity))
 #> List of 2
 #>  $ data: chr "title: My Document\ndate: 2024-01-01\ntags:\n  - tutorial\n  - R\n"
 #>  $ body: chr "Document content starts here."
+#>  - attr(*, "format")= chr "yaml"
+#>  - attr(*, "fence_type")= chr "yaml"
+#>  - attr(*, "class")= chr "front_matter"
 
 # Use a custom parser that adds metadata
 custom_parser <- function(x) {
@@ -206,12 +300,17 @@ str(parse_front_matter(text_yaml, parse_yaml = custom_parser))
 #>   ..$ tags        : chr [1:2] "tutorial" "R"
 #>   ..$ .parsed_with: chr "{frontmatter}"
 #>  $ body: chr "Document content starts here."
+#>  - attr(*, "format")= chr "yaml"
+#>  - attr(*, "fence_type")= chr "yaml"
+#>  - attr(*, "class")= chr "front_matter"
 ```
 
 ## Default Parsers
 
-- **YAML**: Uses `yaml12::parse_yaml()` with YAML 1.2 support
-- **TOML**: Uses `tomledit::parse_toml()`
+- **YAML**: Uses `yaml12::parse_yaml()` with YAML 1.2 support for
+  parsing, and `yaml12::format_yaml()` for serialization
+- **TOML**: Uses `tomledit::parse_toml()` for parsing, and
+  `tomledit::to_toml()` for serialization
 
 ### YAML 1.1 Support
 
