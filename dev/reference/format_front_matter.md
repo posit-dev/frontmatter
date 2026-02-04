@@ -162,13 +162,12 @@ doc <- list(
 
 # Format as a string
 format_front_matter(doc)
-#> [1] "---\ntitle: My Document\nauthor: Jane Doe\n---\n\nDocument content goes here."
+#> [1] "---\ntitle: My Document\nauthor: Jane Doe\n---\n\nDocument content goes here.\n"
 
 # Write to a file
 tmp <- tempfile(fileext = ".md")
 write_front_matter(doc, tmp)
 readLines(tmp)
-#> Warning: incomplete final line found on '/tmp/Rtmpxp7Sva/file1c16b3cc88d.md'
 #> [1] "---"                         "title: My Document"         
 #> [3] "author: Jane Doe"            "---"                        
 #> [5] ""                            "Document content goes here."
@@ -184,7 +183,7 @@ write_front_matter(doc)
 
 # Use TOML format
 format_front_matter(doc, delimiter = "toml")
-#> [1] "+++\ntitle = \"My Document\"\nauthor = \"Jane Doe\"\n+++\n\nDocument content goes here."
+#> [1] "+++\ntitle = \"My Document\"\nauthor = \"Jane Doe\"\n+++\n\nDocument content goes here.\n"
 
 # Use comment-wrapped format for R scripts
 r_script <- list(
@@ -192,7 +191,7 @@ r_script <- list(
   body = "# Load libraries\nlibrary(dplyr)"
 )
 format_front_matter(r_script, delimiter = "yaml_comment")
-#> [1] "# ---\n# title: Analysis Script\n# ---\n#\n# Load libraries\nlibrary(dplyr)"
+#> [1] "# ---\n# title: Analysis Script\n# ---\n#\n# Load libraries\nlibrary(dplyr)\n"
 
 # Roundtrip example: read, modify, write
 original <- "---
@@ -203,5 +202,5 @@ Content here"
 doc <- parse_front_matter(original)
 doc$data$title <- "Modified"
 format_front_matter(doc)
-#> [1] "---\ntitle: Modified\n---\n\nContent here"
+#> [1] "---\ntitle: Modified\n---\n\nContent here\n"
 ```

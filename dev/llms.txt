@@ -113,14 +113,12 @@ doc <- list(
 
 # Format as a string
 format_front_matter(doc)
-#> [1] "---\ntitle: My Document\nauthor: Jane Doe\n---\n\nDocument content goes here."
+#> [1] "---\ntitle: My Document\nauthor: Jane Doe\n---\n\nDocument content goes here.\n"
 
 # Write to a file
 tmp <- tempfile(fileext = ".md")
 write_front_matter(doc, tmp)
 readLines(tmp)
-#> Warning in readLines(tmp): incomplete final line found on
-#> '/var/folders/kd/hwcg76bs58qbx5vghj3jrkvh0000gp/T//RtmpbRBh2m/filea26952be55d3.md'
 #> [1] "---"                         "title: My Document"         
 #> [3] "author: Jane Doe"            "---"                        
 #> [5] ""                            "Document content goes here."
@@ -147,7 +145,7 @@ doc$data$author <- "New Author"
 
 # Format back to string
 format_front_matter(doc)
-#> [1] "---\ntitle: Modified Title\ndate: 2024-01-01\ntags:\n  - tutorial\n  - R\nauthor: New Author\n---\n\nDocument content starts here."
+#> [1] "---\ntitle: Modified Title\ndate: 2024-01-01\ntags:\n  - tutorial\n  - R\nauthor: New Author\n---\n\nDocument content starts here.\n"
 ```
 
 #### Format Options
@@ -168,7 +166,7 @@ format looks like. Here’s a quick example with TOML:
 ``` r
 # Use TOML format
 format_front_matter(doc, delimiter = "toml")
-#> [1] "+++\ntitle = \"Modified Title\"\ndate = \"2024-01-01\"\ntags = [\"tutorial\", \"R\"]\nauthor = \"New Author\"\n+++\n\nDocument content starts here."
+#> [1] "+++\ntitle = \"Modified Title\"\ndate = \"2024-01-01\"\ntags = [\"tutorial\", \"R\"]\nauthor = \"New Author\"\n+++\n\nDocument content starts here.\n"
 ```
 
 ### TOML Front Matter

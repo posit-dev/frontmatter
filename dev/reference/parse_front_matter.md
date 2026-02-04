@@ -132,6 +132,5 @@ read_front_matter(tmpfile)
 #>  $ date : chr "2024-01-01"
 #> 
 #> ──── $body ────
-#> Document content
-#>  
+#> Document content 
 ```
