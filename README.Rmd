@@ -57,8 +57,7 @@ pak::pak("frontmatter")
 Or you can install the development version from [GitHub](https://github.com/posit-dev/frontmatter):
 
 ```r
-# install.packages("pak")
-pak::pak("posit-dev/btw")
+pak::pak("posit-dev/frontmatter")
 ```
 
 ## Usage
