@@ -146,7 +146,7 @@ print.front_matter <- function(x, ...) {
   ))
 
   cat_h2("$data")
-  str(x$data)
+  print(x$data)
   cat("\n")
   cat_h2("$body")
   cat(x$body, "\n")
