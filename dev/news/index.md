@@ -2,6 +2,8 @@
 
 ## frontmatter (development version)
 
+## frontmatter 0.2.0
+
 - New
   [`format_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/format_front_matter.md)
   and
