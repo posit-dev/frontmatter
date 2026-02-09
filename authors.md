@@ -11,7 +11,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/posit-dev/frontmatter/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/posit-dev/frontmatter/blob/v0.2.0/DESCRIPTION)
 
 Aden-Buie G (2026). *frontmatter: Parse Front Matter from Documents*. R
 package version 0.2.0, <https://github.com/posit-dev/frontmatter>.
