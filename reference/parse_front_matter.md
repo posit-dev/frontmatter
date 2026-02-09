@@ -125,15 +125,15 @@ tmpfile <- tempfile(fileext = ".md")
 writeLines(text, tmpfile)
 
 read_front_matter(tmpfile)
-#> $data
-#> $data$title
+#> <front_matter format="toml", delimiter="toml">
+#> ──── $data ────
+#> $title
 #> [1] "My Document"
 #> 
-#> $data$date
+#> $date
 #> [1] "2024-01-01"
 #> 
 #> 
-#> $body
-#> [1] "Document content\n"
-#> 
+#> ──── $body ────
+#> Document content 
 ```

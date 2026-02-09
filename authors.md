@@ -11,15 +11,15 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/posit-dev/frontmatter/blob/v0.1.0/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/posit-dev/frontmatter/blob/main/DESCRIPTION)
 
 Aden-Buie G (2026). *frontmatter: Parse Front Matter from Documents*. R
-package version 0.1.0, <https://github.com/posit-dev/frontmatter>.
+package version 0.2.0, <https://github.com/posit-dev/frontmatter>.
 
     @Manual{,
       title = {frontmatter: Parse Front Matter from Documents},
       author = {Garrick Aden-Buie},
       year = {2026},
-      note = {R package version 0.1.0},
+      note = {R package version 0.2.0},
       url = {https://github.com/posit-dev/frontmatter},
     }

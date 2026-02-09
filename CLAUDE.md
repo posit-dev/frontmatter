@@ -25,9 +25,10 @@ devtools::test(reporter = "check")
 # Run specific test file (matches test-{name}.R)
 devtools::test(filter = "pep723", reporter = "check")
 
-devtools::check()     # Run R CMD check
-devtools::document()  # Rebuild documentation
-devtools::load_all()  # Reload package after C++ changes
+devtools::check()        # Run R CMD check
+devtools::document()     # Rebuild documentation
+devtools::load_all()     # Reload package after C++ changes
+devtools::build_readme() # Rebuild README.md from README.Rmd
 ```
 
 ## Architecture
