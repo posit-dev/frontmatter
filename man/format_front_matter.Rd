@@ -127,9 +127,10 @@ The option takes precedence over the environment variable. Valid values are
 
 Documents formatted with these functions can be read back with
 \code{\link[=parse_front_matter]{parse_front_matter()}} or \code{\link[=read_front_matter]{read_front_matter()}}. For comment-prefixed
-formats (like \code{yaml_comment} or \code{yaml_roxy}), a separator line is
-automatically inserted between the closing fence and the body when the body
-starts with the same comment prefix, ensuring clean roundtrip behavior.
+formats (like \code{yaml_comment}, \code{yaml_roxy}, or \code{yaml_sql_line}), a separator
+line is automatically inserted between the closing fence and the body when
+the body starts with the same comment prefix, ensuring clean roundtrip
+behavior.
 }
 
 \examples{

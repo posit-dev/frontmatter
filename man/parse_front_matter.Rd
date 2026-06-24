@@ -34,7 +34,9 @@ lines removed. If no front matter is found, this is the original text.
 \description{
 Extract and parse YAML or TOML front matter from a file or a text string.
 Front matter is structured metadata at the beginning of a document, delimited
-by fences (\verb{---} for YAML, \verb{+++} for TOML). \code{parse_front_matter()} processes
+by fences (\verb{---} for YAML, \verb{+++} for TOML). Comment-wrapped formats (\verb{#},
+\verb{#'}, \verb{--}) and SQL block comments (\verb{/* */}) are also supported.
+\code{parse_front_matter()} processes
 a character string, while \code{read_front_matter()} reads from a file. Both
 functions return a list with the parsed front matter and the document body.
 }

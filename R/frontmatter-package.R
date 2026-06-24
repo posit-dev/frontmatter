@@ -8,6 +8,7 @@
 #' * Standard YAML (`---` delimiters)
 #' * Standard TOML (`+++` delimiters)
 #' * Comment-wrapped formats for R/Python files (`#` and `#'` prefixes)
+#' * SQL comment formats (`--` line comments and `/* */` block comments)
 #' * PEP 723 Python inline script metadata
 #'
 #' @section Main Functions:

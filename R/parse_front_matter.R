@@ -2,7 +2,9 @@
 #'
 #' Extract and parse YAML or TOML front matter from a file or a text string.
 #' Front matter is structured metadata at the beginning of a document, delimited
-#' by fences (`---` for YAML, `+++` for TOML). `parse_front_matter()` processes
+#' by fences (`---` for YAML, `+++` for TOML). Comment-wrapped formats (`#`,
+#' `#'`, `--`) and SQL block comments (`/* */`) are also supported.
+#' `parse_front_matter()` processes
 #' a character string, while `read_front_matter()` reads from a file. Both
 #' functions return a list with the parsed front matter and the document body.
 #'

@@ -56,9 +56,10 @@
 #'
 #' Documents formatted with these functions can be read back with
 #' [parse_front_matter()] or [read_front_matter()]. For comment-prefixed
-#' formats (like `yaml_comment` or `yaml_roxy`), a separator line is
-#' automatically inserted between the closing fence and the body when the body
-#' starts with the same comment prefix, ensuring clean roundtrip behavior.
+#' formats (like `yaml_comment`, `yaml_roxy`, or `yaml_sql_line`), a separator
+#' line is automatically inserted between the closing fence and the body when
+#' the body starts with the same comment prefix, ensuring clean roundtrip
+#' behavior.
 #'
 #' @examples
 #' # Create a document with YAML front matter
