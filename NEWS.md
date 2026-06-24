@@ -1,5 +1,12 @@
 # frontmatter (development version)
 
+* Added SQL front matter support with two comment styles: line comments
+  (`-- ---`/`-- +++`) and block comments in compact (`/* ---` ... `--- */`) and
+  expanded (`/*` + `---` ... `---` + `*/`) forms. Six new delimiter shortcuts
+  are available for `write_front_matter()`: `yaml_sql_line`,
+  `toml_sql_line`, `yaml_sql_block_compact`, `toml_sql_block_compact`,
+  `yaml_sql_block_expanded`, and `toml_sql_block_expanded` (#4).
+
 # frontmatter 0.2.0
 
 * New `format_front_matter()` and `write_front_matter()` functions for serializing documents with YAML or TOML front matter. These are the inverse of `parse_front_matter()` and `read_front_matter()`, enabling full roundtrip support. Supports all delimiter formats including standard (`---`, `+++`), comment-wrapped (`# ---`, `#' ---`), and PEP 723. Note that the roundtrip is not perfect; comments and formatting within the front matter content may not be preserved.
