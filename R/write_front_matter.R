@@ -176,12 +176,16 @@ format_front_matter <- function(
 
       if (!is.null(body) && !identical(prefix, "")) {
         trimmed <- trimws(prefix, "right")
-        if (
-          substring(body, 1, nchar(prefix)) == prefix ||
-            startsWith(body, paste0(trimmed, "\n")) ||
-            startsWith(body, paste0(trimmed, "\r\n")) ||
-            body == trimmed
-        ) {
+        starts_with_prefix <- substring(body, 1, nchar(prefix)) == prefix
+        starts_with_bare <- grepl(
+          paste0(
+            "^",
+            gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", trimmed),
+            "[ \t]*(\r?\n|$)"
+          ),
+          body
+        )
+        if (starts_with_prefix || starts_with_bare) {
           space_line <- trimmed
         }
       }
