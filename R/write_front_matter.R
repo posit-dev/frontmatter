@@ -20,6 +20,12 @@
 #' | `"yaml_roxy"` | YAML | `#' ---` | `#' ---` | Roxygen2 documentation |
 #' | `"toml_roxy"` | TOML | `#' +++` | `#' +++` | Roxygen2 documentation |
 #' | `"toml_pep723"` | TOML | `# /// script` | `# ///` | Python PEP 723 inline metadata |
+#' | `"yaml_sql_line"` | YAML | `-- ---` | `-- ---` | SQL scripts (line comments) |
+#' | `"toml_sql_line"` | TOML | `-- +++` | `-- +++` | SQL scripts (line comments) |
+#' | `"yaml_sql_block_compact"` | YAML | `/* ---` | `--- */` | SQL scripts (block comments) |
+#' | `"toml_sql_block_compact"` | TOML | `/* +++` | `+++ */` | SQL scripts (block comments) |
+#' | `"yaml_sql_block_expanded"` | YAML | `/*` + `---` | `---` + `*/` | SQL scripts (block comments) |
+#' | `"toml_sql_block_expanded"` | TOML | `/*` + `+++` | `+++` + `*/` | SQL scripts (block comments) |
 #'
 #' For custom delimiters, pass a character vector of length 1, 2, or 3:
 #' - **Length 1**: Used as both opener and closer, with no line prefix
@@ -246,6 +252,12 @@ normalize_delimiter <- function(delimiter) {
       yaml_roxy = c("#' ---", "#' "),
       toml_roxy = c("#' +++", "#' "),
       toml_pep723 = c("# /// script", "# ", "# ///"),
+      yaml_sql_line = c("-- ---", "-- "),
+      toml_sql_line = c("-- +++", "-- "),
+      yaml_sql_block_compact = c("/* ---", "", "--- */"),
+      toml_sql_block_compact = c("/* +++", "", "+++ */"),
+      yaml_sql_block_expanded = c("/*\n---", "", "---\n*/"),
+      toml_sql_block_expanded = c("/*\n+++", "", "+++\n*/"),
       delimiter
     )
   }
