@@ -308,13 +308,15 @@ size_t find_comment_closing_fence(const char* str, size_t start_pos, size_t len,
 
 // Helper: Trim leading blank/comment-only lines (for comment-wrapped formats)
 // Only removes separator lines like "#" or "#'" - body is returned unchanged
+// Strips any number of empty lines but at most one bare comment line
 std::string trim_leading_comment_lines(const std::string& body, const char* prefix) {
   const char* data = body.data();
   size_t pos = 0;
   size_t len = body.length();
   size_t prefix_len = strlen(prefix);
+  bool stripped_bare_comment = false;
 
-  // Skip leading empty lines and bare comment lines (separator lines)
+  // Skip leading empty lines and at most one bare comment line (separator)
   while (pos < len) {
     size_t line_start = pos;
 
@@ -333,60 +335,60 @@ std::string trim_leading_comment_lines(const std::string& body, const char* pref
       continue;
     }
 
-    // Check if line is a bare comment character (e.g., "#" or "#'")
-    // For "# " prefix, check for bare "#"
-    if (prefix_len == 2 && prefix[0] == '#' && prefix[1] == ' ' && data[pos] == '#') {
-      size_t check_pos = pos + 1;
-      // Skip optional whitespace after bare #
-      while (check_pos < len && is_whitespace(data[check_pos])) {
-        check_pos++;
-      }
-      if (check_pos >= len || data[check_pos] == '\n' || (data[check_pos] == '\r' && check_pos + 1 < len && data[check_pos + 1] == '\n')) {
-        // It's bare "#" - skip it
-        pos = check_pos;
-        if (pos < len) {
-          if (data[pos] == '\r') pos += 2;
-          else if (data[pos] == '\n') pos++;
+    // Check if line is a bare comment character (e.g., "#" or "#'" or "--")
+    // Only strip at most one bare comment line (the separator)
+    if (!stripped_bare_comment) {
+      // For "# " prefix, check for bare "#"
+      if (prefix_len == 2 && prefix[0] == '#' && prefix[1] == ' ' && data[pos] == '#') {
+        size_t check_pos = pos + 1;
+        while (check_pos < len && is_whitespace(data[check_pos])) {
+          check_pos++;
         }
-        continue;
+        if (check_pos >= len || data[check_pos] == '\n' || (data[check_pos] == '\r' && check_pos + 1 < len && data[check_pos + 1] == '\n')) {
+          pos = check_pos;
+          if (pos < len) {
+            if (data[pos] == '\r') pos += 2;
+            else if (data[pos] == '\n') pos++;
+          }
+          stripped_bare_comment = true;
+          continue;
+        }
       }
-    }
 
-    // For "#' " prefix, check for bare "#'"
-    if (prefix_len == 3 && prefix[0] == '#' && prefix[1] == '\'' && prefix[2] == ' ' &&
-        pos + 2 <= len && data[pos] == '#' && data[pos + 1] == '\'') {
-      size_t check_pos = pos + 2;
-      // Skip optional whitespace after bare #'
-      while (check_pos < len && is_whitespace(data[check_pos])) {
-        check_pos++;
-      }
-      if (check_pos >= len || data[check_pos] == '\n' || (data[check_pos] == '\r' && check_pos + 1 < len && data[check_pos + 1] == '\n')) {
-        // It's bare "#'" - skip it
-        pos = check_pos;
-        if (pos < len) {
-          if (data[pos] == '\r') pos += 2;
-          else if (data[pos] == '\n') pos++;
+      // For "#' " prefix, check for bare "#'"
+      if (prefix_len == 3 && prefix[0] == '#' && prefix[1] == '\'' && prefix[2] == ' ' &&
+          pos + 2 <= len && data[pos] == '#' && data[pos + 1] == '\'') {
+        size_t check_pos = pos + 2;
+        while (check_pos < len && is_whitespace(data[check_pos])) {
+          check_pos++;
         }
-        continue;
+        if (check_pos >= len || data[check_pos] == '\n' || (data[check_pos] == '\r' && check_pos + 1 < len && data[check_pos + 1] == '\n')) {
+          pos = check_pos;
+          if (pos < len) {
+            if (data[pos] == '\r') pos += 2;
+            else if (data[pos] == '\n') pos++;
+          }
+          stripped_bare_comment = true;
+          continue;
+        }
       }
-    }
 
-    // For "-- " prefix, check for bare "--"
-    if (prefix_len == 3 && prefix[0] == '-' && prefix[1] == '-' && prefix[2] == ' ' &&
-        pos + 2 <= len && data[pos] == '-' && data[pos + 1] == '-') {
-      size_t check_pos = pos + 2;
-      // Skip optional whitespace after bare --
-      while (check_pos < len && is_whitespace(data[check_pos])) {
-        check_pos++;
-      }
-      if (check_pos >= len || data[check_pos] == '\n' || (data[check_pos] == '\r' && check_pos + 1 < len && data[check_pos + 1] == '\n')) {
-        // It's bare "--" - skip it
-        pos = check_pos;
-        if (pos < len) {
-          if (data[pos] == '\r') pos += 2;
-          else if (data[pos] == '\n') pos++;
+      // For "-- " prefix, check for bare "--"
+      if (prefix_len == 3 && prefix[0] == '-' && prefix[1] == '-' && prefix[2] == ' ' &&
+          pos + 2 <= len && data[pos] == '-' && data[pos + 1] == '-') {
+        size_t check_pos = pos + 2;
+        while (check_pos < len && is_whitespace(data[check_pos])) {
+          check_pos++;
         }
-        continue;
+        if (check_pos >= len || data[check_pos] == '\n' || (data[check_pos] == '\r' && check_pos + 1 < len && data[check_pos + 1] == '\n')) {
+          pos = check_pos;
+          if (pos < len) {
+            if (data[pos] == '\r') pos += 2;
+            else if (data[pos] == '\n') pos++;
+          }
+          stripped_bare_comment = true;
+          continue;
+        }
       }
     }
 
@@ -477,13 +479,13 @@ size_t find_sql_block_closing(const char* str, size_t start_pos, size_t len, con
       }
 
       if (is_compact) {
-        // Compact closer: fence then at least one space then "*/" then whitespace until newline/EOF
+        // Compact closer: fence then exactly " */" then optional trailing whitespace
         size_t i = after_fence;
         if (i >= len || str[i] != ' ') {
           pos = skip_to_next_line(str, pos, len);
           continue;
         }
-        while (i < len && is_whitespace(str[i])) i++;
+        i++;
         if (i + 2 <= len && str[i] == '*' && str[i + 1] == '/') {
           i += 2;
           while (i < len && is_whitespace(str[i])) i++;

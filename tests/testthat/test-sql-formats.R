@@ -291,6 +291,14 @@ test_that("compact closer with tab before */ does not match", {
   expect_equal(result$body, text)
 })
 
+test_that("compact closer with multiple spaces before */ does not match", {
+  text <- "/* ---\ntitle: Test\n---   */\nSELECT 1"
+  result <- parse_front_matter(text)
+
+  expect_null(result$data)
+  expect_equal(result$body, text)
+})
+
 test_that("prefix mismatch: -- --- opener with # --- closer fails", {
   text <- "-- ---\n-- title: Test\n# ---\nSELECT 1"
   result <- parse_front_matter(text)
@@ -407,4 +415,19 @@ test_that("write and roundtrip toml_sql_block_expanded format", {
   expect_equal(result$data$title, "Test")
   expect_equal(result$data$author, "Me")
   expect_equal(result$body, "SELECT * FROM sales")
+})
+
+test_that("roundtrip preserves body starting with bare --", {
+  tmp <- withr::local_tempfile(fileext = ".sql")
+
+  fm <- list(
+    data = list(title = "Test"),
+    body = "--\nSELECT 1"
+  )
+
+  write_front_matter(fm, tmp, delimiter = "yaml_sql_line")
+  result <- read_front_matter(tmp)
+
+  expect_equal(result$data$title, "Test")
+  expect_equal(result$body, "--\nSELECT 1")
 })

@@ -175,8 +175,14 @@ format_front_matter <- function(
       space_line <- ""
 
       if (!is.null(body) && !identical(prefix, "")) {
-        if (substring(body, 1, nchar(prefix)) == prefix) {
-          space_line <- trimws(prefix, "right")
+        trimmed <- trimws(prefix, "right")
+        if (
+          substring(body, 1, nchar(prefix)) == prefix ||
+            startsWith(body, paste0(trimmed, "\n")) ||
+            startsWith(body, paste0(trimmed, "\r\n")) ||
+            body == trimmed
+        ) {
+          space_line <- trimmed
         }
       }
     }
