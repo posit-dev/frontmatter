@@ -68,6 +68,13 @@ test_that("SQL line comment TOML fence_type attribute is toml_sql_line", {
   expect_equal(attr(result, "format"), "toml")
 })
 
+test_that("SQL line comment bare -- preserves empty lines in YAML block scalar", {
+  text <- "-- ---\n-- note: |\n--   line 1\n--\n--   line 3\n-- ---\n"
+  result <- parse_front_matter(text)
+
+  expect_equal(result$data$note, "line 1\n\nline 3\n")
+})
+
 # SQL block comments - compact ----
 
 test_that("SQL block comment compact YAML works", {
@@ -262,6 +269,14 @@ test_that("--- inside block comment content does not trigger false close", {
 
 test_that("/* ---- (4 dashes) does not match", {
   text <- "/* ----\ntitle: Test\n---- */\nSELECT 1"
+  result <- parse_front_matter(text)
+
+  expect_null(result$data)
+  expect_equal(result$body, text)
+})
+
+test_that("compact closer ---*/ without space does not match", {
+  text <- "/* ---\ntitle: Test\n---*/\nSELECT 1"
   result <- parse_front_matter(text)
 
   expect_null(result$data)

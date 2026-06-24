@@ -232,10 +232,16 @@ std::string unwrap_comments(const std::string& content, const char* prefix) {
           check_pos++;
         }
         if (check_pos >= len || data[check_pos] == '\n' || data[check_pos] == '\r') {
-          // It's bare "--" - skip it entirely
+          // It's bare "--" - emit empty line
           pos = check_pos;
-          if (pos < len && data[pos] == '\r') pos++;
-          if (pos < len && data[pos] == '\n') pos++;
+          if (pos < len && data[pos] == '\r') {
+            result += '\r';
+            pos++;
+          }
+          if (pos < len && data[pos] == '\n') {
+            result += '\n';
+            pos++;
+          }
           continue;
         }
       }
@@ -471,8 +477,12 @@ size_t find_sql_block_closing(const char* str, size_t start_pos, size_t len, con
       }
 
       if (is_compact) {
-        // Compact closer: fence then whitespace then "*/" then whitespace until newline/EOF
+        // Compact closer: fence then at least one space then "*/" then whitespace until newline/EOF
         size_t i = after_fence;
+        if (i >= len || !is_whitespace(str[i])) {
+          pos = skip_to_next_line(str, pos, len);
+          continue;
+        }
         while (i < len && is_whitespace(str[i])) i++;
         if (i + 2 <= len && str[i] == '*' && str[i + 1] == '/') {
           i += 2;
