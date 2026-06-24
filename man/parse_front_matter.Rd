@@ -49,7 +49,7 @@ functions return a list with the parsed front matter and the document body.
 
 
 By default, the package uses \code{\link[yaml12:parse_yaml]{yaml12::parse_yaml()}} for YAML and
-\code{\link[tomledit:read]{tomledit::parse_toml()}} for TOML. You can provide custom parser functions
+\code{\link[tomledit:parse_toml]{tomledit::parse_toml()}} for TOML. You can provide custom parser functions
 via \code{parse_yaml} and \code{parse_toml} to override these defaults.
 
 Use \code{identity} to return the raw YAML or TOML string without parsing.

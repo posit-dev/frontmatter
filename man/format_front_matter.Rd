@@ -80,6 +80,12 @@ matter. You can use these built-in shortcuts:\tabular{lllll}{
    \code{"yaml_roxy"} \tab YAML \tab \verb{#' ---} \tab \verb{#' ---} \tab Roxygen2 documentation \cr
    \code{"toml_roxy"} \tab TOML \tab \verb{#' +++} \tab \verb{#' +++} \tab Roxygen2 documentation \cr
    \code{"toml_pep723"} \tab TOML \tab \verb{# /// script} \tab \verb{# ///} \tab Python PEP 723 inline metadata \cr
+   \code{"yaml_sql_line"} \tab YAML \tab \verb{-- ---} \tab \verb{-- ---} \tab SQL scripts (line comments) \cr
+   \code{"toml_sql_line"} \tab TOML \tab \verb{-- +++} \tab \verb{-- +++} \tab SQL scripts (line comments) \cr
+   \code{"yaml_sql_block_compact"} \tab YAML \tab \verb{/* ---} \tab \verb{--- */} \tab SQL scripts (block comments) \cr
+   \code{"toml_sql_block_compact"} \tab TOML \tab \verb{/* +++} \tab \verb{+++ */} \tab SQL scripts (block comments) \cr
+   \code{"yaml_sql_block_expanded"} \tab YAML \tab \verb{/*} + \verb{---} \tab \verb{---} + \verb{*/} \tab SQL scripts (block comments) \cr
+   \code{"toml_sql_block_expanded"} \tab TOML \tab \verb{/*} + \verb{+++} \tab \verb{+++} + \verb{*/} \tab SQL scripts (block comments) \cr
 }
 
 
@@ -95,7 +101,7 @@ For custom delimiters, pass a character vector of length 1, 2, or 3:
 
 
 By default, the package uses \code{\link[yaml12:format_yaml]{yaml12::format_yaml()}} for YAML and
-\code{\link[tomledit:write]{tomledit::to_toml()}} for TOML. You can provide custom formatter functions
+\code{\link[tomledit:to_toml]{tomledit::to_toml()}} for TOML. You can provide custom formatter functions
 via \code{format_yaml} and \code{format_toml} to override these defaults.
 
 Custom formatters must accept an R object and return a character string
