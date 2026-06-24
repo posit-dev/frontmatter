@@ -479,7 +479,7 @@ size_t find_sql_block_closing(const char* str, size_t start_pos, size_t len, con
       if (is_compact) {
         // Compact closer: fence then at least one space then "*/" then whitespace until newline/EOF
         size_t i = after_fence;
-        if (i >= len || !is_whitespace(str[i])) {
+        if (i >= len || str[i] != ' ') {
           pos = skip_to_next_line(str, pos, len);
           continue;
         }

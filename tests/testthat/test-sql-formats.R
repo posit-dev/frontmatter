@@ -283,6 +283,14 @@ test_that("compact closer ---*/ without space does not match", {
   expect_equal(result$body, text)
 })
 
+test_that("compact closer with tab before */ does not match", {
+  text <- "/* ---\ntitle: Test\n---\t*/\nSELECT 1"
+  result <- parse_front_matter(text)
+
+  expect_null(result$data)
+  expect_equal(result$body, text)
+})
+
 test_that("prefix mismatch: -- --- opener with # --- closer fails", {
   text <- "-- ---\n-- title: Test\n# ---\nSELECT 1"
   result <- parse_front_matter(text)
