@@ -181,7 +181,7 @@ r_script <- list(
 )
 format_front_matter(r_script, delimiter = "yaml_comment")
 
-# Write to an R file: delimiter inferred from .R extension -> yaml_comment
+# Write to an R file: delimiter inferred from .R extension -> yaml_roxy
 tmp_r <- tempfile(fileext = ".R")
 write_front_matter(r_script, tmp_r)
 readLines(tmp_r)
