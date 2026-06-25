@@ -488,6 +488,115 @@ test_that("FRONTMATTER_SERIALIZE_YAML_SPEC = '1.1' envvar uses yaml package", {
   expect_equal(result$body, "Body content")
 })
 
+# Delimiter inference -----------------------------------------------------
+
+test_that("format_front_matter() infers delimiter from fence_type attribute", {
+  doc <- parse_front_matter("# ---\ntitle: Test\n# ---\n# R code")
+  expect_equal(attr(doc, "fence_type"), "yaml_comment")
+
+  out <- format_front_matter(doc)
+  expect_true(startsWith(out, "# ---"))
+})
+
+test_that("format_front_matter() falls back to yaml when no fence_type attr", {
+  doc <- list(data = list(title = "Test"), body = "body")
+  out <- format_front_matter(doc)
+  expect_true(startsWith(out, "---"))
+})
+
+test_that("format_front_matter() explicit delimiter overrides fence_type attr", {
+  doc <- parse_front_matter("# ---\ntitle: Test\n# ---\n# R code")
+  out <- format_front_matter(doc, delimiter = "yaml")
+  expect_true(startsWith(out, "---\n"))
+  expect_false(startsWith(out, "# ---"))
+})
+
+test_that("write_front_matter() infers delimiter from fence_type attribute", {
+  tmp <- withr::local_tempfile(fileext = ".sql")
+  doc <- parse_front_matter("/* ---\ntitle: Query\n--- */\nSELECT 1")
+  expect_equal(attr(doc, "fence_type"), "yaml_sql_block_compact")
+
+  write_front_matter(doc, tmp)
+  content <- paste(readLines(tmp, warn = FALSE), collapse = "\n")
+  expect_true(startsWith(content, "/* ---"))
+})
+
+test_that("write_front_matter() infers delimiter from .sql extension", {
+  tmp <- withr::local_tempfile(fileext = ".sql")
+  doc <- list(data = list(title = "Query"), body = "SELECT 1")
+
+  write_front_matter(doc, tmp)
+  content <- paste(readLines(tmp, warn = FALSE), collapse = "\n")
+  expect_true(startsWith(content, "/* ---"))
+})
+
+test_that("write_front_matter() infers delimiter from .R extension", {
+  tmp <- withr::local_tempfile(fileext = ".R")
+  doc <- list(data = list(title = "Script"), body = "x <- 1")
+
+  write_front_matter(doc, tmp)
+  content <- paste(readLines(tmp, warn = FALSE), collapse = "\n")
+  expect_true(startsWith(content, "#' ---"))
+})
+
+test_that("write_front_matter() infers delimiter from .py extension", {
+  tmp <- withr::local_tempfile(fileext = ".py")
+  doc <- list(
+    data = list(dependencies = c("requests")),
+    body = "import requests"
+  )
+
+  write_front_matter(doc, tmp)
+  content <- paste(readLines(tmp, warn = FALSE), collapse = "\n")
+  expect_true(startsWith(content, "# /// script"))
+})
+
+test_that("write_front_matter() fence_type attr takes priority over file extension", {
+  tmp <- withr::local_tempfile(fileext = ".sql")
+  doc <- parse_front_matter("# ---\ntitle: Test\n# ---\n-- query")
+  expect_equal(attr(doc, "fence_type"), "yaml_comment")
+
+  write_front_matter(doc, tmp)
+  content <- paste(readLines(tmp, warn = FALSE), collapse = "\n")
+  expect_true(startsWith(content, "# ---"))
+})
+
+test_that("write_front_matter() falls back to yaml for unknown extension", {
+  tmp <- withr::local_tempfile(fileext = ".txt")
+  doc <- list(data = list(title = "Test"), body = "body")
+
+  write_front_matter(doc, tmp)
+  content <- paste(readLines(tmp, warn = FALSE), collapse = "\n")
+  expect_true(startsWith(content, "---"))
+})
+
+test_that("write_front_matter() infers yaml delimiter for .md, .qmd, .Rmd extensions", {
+  doc <- list(data = list(title = "Test"), body = "body")
+
+  for (ext in c("md", "qmd", "Rmd")) {
+    tmp <- withr::local_tempfile(fileext = paste0(".", ext))
+    write_front_matter(doc, tmp)
+    content <- paste(readLines(tmp, warn = FALSE), collapse = "\n")
+    expect_true(startsWith(content, "---\n"), info = paste("extension:", ext))
+    expect_false(startsWith(content, "# ---"), info = paste("extension:", ext))
+  }
+})
+
+test_that("roundtrip: sql file preserves yaml_sql_block_compact without explicit delimiter", {
+  tmp <- withr::local_tempfile(fileext = ".sql")
+
+  original <- "/* ---\ntitle: My Query\nauthor: Test\n--- */\nSELECT * FROM foo"
+  doc <- parse_front_matter(original)
+  doc$data$author <- "Updated"
+
+  write_front_matter(doc, tmp)
+  result <- read_front_matter(tmp)
+
+  expect_equal(result$data$title, "My Query")
+  expect_equal(result$data$author, "Updated")
+  expect_equal(attr(result, "fence_type"), "yaml_sql_block_compact")
+})
+
 test_that("frontmatter.serialize_yaml.spec option takes precedence over envvar", {
   withr::local_envvar(FRONTMATTER_SERIALIZE_YAML_SPEC = "1.2")
   withr::local_options(frontmatter.serialize_yaml.spec = "1.1")
