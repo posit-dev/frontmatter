@@ -570,6 +570,18 @@ test_that("write_front_matter() falls back to yaml for unknown extension", {
   expect_true(startsWith(content, "---"))
 })
 
+test_that("write_front_matter() infers yaml delimiter for .md, .qmd, .Rmd extensions", {
+  doc <- list(data = list(title = "Test"), body = "body")
+
+  for (ext in c("md", "qmd", "Rmd")) {
+    tmp <- withr::local_tempfile(fileext = paste0(".", ext))
+    write_front_matter(doc, tmp)
+    content <- paste(readLines(tmp, warn = FALSE), collapse = "\n")
+    expect_true(startsWith(content, "---\n"), info = paste("extension:", ext))
+    expect_false(startsWith(content, "# ---"), info = paste("extension:", ext))
+  }
+})
+
 test_that("roundtrip: sql file preserves yaml_sql_block_compact without explicit delimiter", {
   tmp <- withr::local_tempfile(fileext = ".sql")
 
