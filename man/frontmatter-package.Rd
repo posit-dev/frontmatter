@@ -16,6 +16,7 @@ delimited by fences.
 \item Standard YAML (\verb{---} delimiters)
 \item Standard TOML (\verb{+++} delimiters)
 \item Comment-wrapped formats for R/Python files (\verb{#} and \verb{#'} prefixes)
+\item SQL comment formats (\verb{--} line comments and \verb{/* */} block comments)
 \item PEP 723 Python inline script metadata
 }
 }
@@ -45,6 +46,11 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Garrick Aden-Buie \email{garrick@posit.co} (\href{https://orcid.org/0000-0002-7111-0077}{ORCID})
+
+Authors:
+\itemize{
+  \item Garrick Aden-Buie \email{garrick@posit.co} (\href{https://orcid.org/0000-0002-7111-0077}{ORCID})
+}
 
 Other contributors:
 \itemize{

@@ -20,6 +20,12 @@
 #' | `"yaml_roxy"` | YAML | `#' ---` | `#' ---` | Roxygen2 documentation |
 #' | `"toml_roxy"` | TOML | `#' +++` | `#' +++` | Roxygen2 documentation |
 #' | `"toml_pep723"` | TOML | `# /// script` | `# ///` | Python PEP 723 inline metadata |
+#' | `"yaml_sql_line"` | YAML | `-- ---` | `-- ---` | SQL scripts (line comments) |
+#' | `"toml_sql_line"` | TOML | `-- +++` | `-- +++` | SQL scripts (line comments) |
+#' | `"yaml_sql_block_compact"` | YAML | `/* ---` | `--- */` | SQL scripts (block comments) |
+#' | `"toml_sql_block_compact"` | TOML | `/* +++` | `+++ */` | SQL scripts (block comments) |
+#' | `"yaml_sql_block_expanded"` | YAML | `/*` + `---` | `---` + `*/` | SQL scripts (block comments) |
+#' | `"toml_sql_block_expanded"` | TOML | `/*` + `+++` | `+++` + `*/` | SQL scripts (block comments) |
 #'
 #' For custom delimiters, pass a character vector of length 1, 2, or 3:
 #' - **Length 1**: Used as both opener and closer, with no line prefix
@@ -50,9 +56,10 @@
 #'
 #' Documents formatted with these functions can be read back with
 #' [parse_front_matter()] or [read_front_matter()]. For comment-prefixed
-#' formats (like `yaml_comment` or `yaml_roxy`), a separator line is
-#' automatically inserted between the closing fence and the body when the body
-#' starts with the same comment prefix, ensuring clean roundtrip behavior.
+#' formats (like `yaml_comment`, `yaml_roxy`, or `yaml_sql_line`), a separator
+#' line is automatically inserted between the closing fence and the body when
+#' the body starts with the same comment prefix, ensuring clean roundtrip
+#' behavior.
 #'
 #' @examples
 #' # Create a document with YAML front matter
@@ -169,8 +176,18 @@ format_front_matter <- function(
       space_line <- ""
 
       if (!is.null(body) && !identical(prefix, "")) {
-        if (substring(body, 1, nchar(prefix)) == prefix) {
-          space_line <- trimws(prefix, "right")
+        trimmed <- trimws(prefix, "right")
+        starts_with_prefix <- substring(body, 1, nchar(prefix)) == prefix
+        starts_with_bare <- grepl(
+          paste0(
+            "^",
+            gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", trimmed),
+            "[ \t]*(\r?\n|$)"
+          ),
+          body
+        )
+        if (starts_with_prefix || starts_with_bare) {
+          space_line <- trimmed
         }
       }
     }
@@ -246,6 +263,12 @@ normalize_delimiter <- function(delimiter) {
       yaml_roxy = c("#' ---", "#' "),
       toml_roxy = c("#' +++", "#' "),
       toml_pep723 = c("# /// script", "# ", "# ///"),
+      yaml_sql_line = c("-- ---", "-- "),
+      toml_sql_line = c("-- +++", "-- "),
+      yaml_sql_block_compact = c("/* ---", "", "--- */"),
+      toml_sql_block_compact = c("/* +++", "", "+++ */"),
+      yaml_sql_block_expanded = c("/*\n---", "", "---\n*/"),
+      toml_sql_block_expanded = c("/*\n+++", "", "+++\n*/"),
       delimiter
     )
   }

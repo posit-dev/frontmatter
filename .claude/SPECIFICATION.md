@@ -185,6 +185,82 @@ pprint(requests.get("https://peps.python.org/api/peps.json").json())
 
 The parser should extract the TOML content between the `# /// script` and `# ///` lines, stripping the leading `# ` from each line, and return the remaining document content starting from the line after `# ///`.
 
+### In SQL Files
+
+When parsing SQL files, front matter may be stored within SQL comments. Two comment styles are supported: line comments (`--`) and block comments (`/* */`).
+
+#### SQL line comments
+
+``` yaml
+-- ---
+-- key: value
+-- ---
+
+SELECT * FROM table;
+```
+
+``` toml
+-- +++
+-- key = "value"
+-- +++
+
+SELECT * FROM table;
+```
+
+Uses `-- ` (two dashes + space) as the comment prefix. Content lines are stripped of the `-- ` prefix. Bare `--` lines (just `--` with optional whitespace) are treated as empty lines. Remove either leading whitespace lines or lines with only `--` from the document body.
+
+#### SQL block comments — compact form
+
+``` yaml
+/* ---
+key: value
+--- */
+
+SELECT * FROM table;
+```
+
+``` toml
+/* +++
+key = "value"
++++ */
+
+SELECT * FROM table;
+```
+
+The opening line is `/* ` followed by the fence (`---` or `+++`), with only trailing whitespace allowed. The closing line is the fence followed by ` */`, with only trailing whitespace allowed. Content between fences is raw (no prefix stripping). The opening and closing must both use the compact form (symmetry enforced).
+
+#### SQL block comments — expanded form
+
+``` yaml
+/*
+---
+key: value
+---
+*/
+
+SELECT * FROM table;
+```
+
+``` toml
+/*
++++
+key = "value"
++++
+*/
+
+SELECT * FROM table;
+```
+
+The opening consists of `/*` on its own line (only trailing whitespace allowed), followed by the fence (`---` or `+++`) on the next line. The closing consists of the fence on its own line, followed by `*/` on the next line. The `*/` line may have leading whitespace (common SQL style), but the `---`/`+++` fence lines must start at column 0 (no indentation). Content between fences is raw (no prefix stripping). The opening and closing must both use the expanded form (symmetry enforced).
+
+#### Detection priority
+
+The parser checks formats in this order (most specific first):
+1. PEP 723 (`# /// script` ... `# ///`)
+2. Comment-wrapped YAML/TOML (`# ---`, `#' ---`, `-- ---`)
+3. SQL block comments (`/* ---` or `/*` + newline + `---`)
+4. Standard YAML (`---`) or TOML (`+++`)
+
 
 ### Invalid Front Matter Handling
 

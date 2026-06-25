@@ -158,6 +158,13 @@ size_t check_comment_fence(const char* str, size_t pos, size_t len, const char* 
     return 6;  // Length of "#' ---" or "#' +++"
   }
 
+  // Try "-- " prefix (SQL line comment): "-- ---" or "-- +++"
+  if (pos + 6 <= len && str[pos] == '-' && str[pos + 1] == '-' &&
+      str[pos + 2] == ' ' && memcmp(str + pos + 3, fence_chars, 3) == 0) {
+    *out_prefix = "-- ";
+    return 6;  // Length of "-- ---" or "-- +++"
+  }
+
   return 0;
 }
 
@@ -213,6 +220,29 @@ std::string unwrap_comments(const std::string& content, const char* prefix) {
             if (pos < len && data[pos] == '\n') pos++;
             continue;
           }
+        }
+      }
+    } else if (prefix_len == 3 && prefix[0] == '-' && prefix[1] == '-' && prefix[2] == ' ' && data[pos] == '-') {
+      // Check for bare "--" line - only if prefix is "-- "
+      size_t check_pos = pos + 1;
+      if (check_pos < len && data[check_pos] == '-') {
+        check_pos++;
+        // Skip optional whitespace after bare --
+        while (check_pos < len && is_whitespace(data[check_pos])) {
+          check_pos++;
+        }
+        if (check_pos >= len || data[check_pos] == '\n' || data[check_pos] == '\r') {
+          // It's bare "--" - emit empty line
+          pos = check_pos;
+          if (pos < len && data[pos] == '\r') {
+            result += '\r';
+            pos++;
+          }
+          if (pos < len && data[pos] == '\n') {
+            result += '\n';
+            pos++;
+          }
+          continue;
         }
       }
     }
@@ -278,13 +308,15 @@ size_t find_comment_closing_fence(const char* str, size_t start_pos, size_t len,
 
 // Helper: Trim leading blank/comment-only lines (for comment-wrapped formats)
 // Only removes separator lines like "#" or "#'" - body is returned unchanged
+// Strips any number of empty lines but at most one bare comment line
 std::string trim_leading_comment_lines(const std::string& body, const char* prefix) {
   const char* data = body.data();
   size_t pos = 0;
   size_t len = body.length();
   size_t prefix_len = strlen(prefix);
+  bool stripped_bare_comment = false;
 
-  // Skip leading empty lines and bare comment lines (separator lines)
+  // Skip leading empty lines and at most one bare comment line (separator)
   while (pos < len) {
     size_t line_start = pos;
 
@@ -303,41 +335,60 @@ std::string trim_leading_comment_lines(const std::string& body, const char* pref
       continue;
     }
 
-    // Check if line is a bare comment character (e.g., "#" or "#'")
-    // For "# " prefix, check for bare "#"
-    if (prefix_len == 2 && prefix[0] == '#' && prefix[1] == ' ' && data[pos] == '#') {
-      size_t check_pos = pos + 1;
-      // Skip optional whitespace after bare #
-      while (check_pos < len && is_whitespace(data[check_pos])) {
-        check_pos++;
-      }
-      if (check_pos >= len || data[check_pos] == '\n' || (data[check_pos] == '\r' && check_pos + 1 < len && data[check_pos + 1] == '\n')) {
-        // It's bare "#" - skip it
-        pos = check_pos;
-        if (pos < len) {
-          if (data[pos] == '\r') pos += 2;
-          else if (data[pos] == '\n') pos++;
+    // Check if line is a bare comment character (e.g., "#" or "#'" or "--")
+    // Only strip at most one bare comment line (the separator)
+    if (!stripped_bare_comment) {
+      // For "# " prefix, check for bare "#"
+      if (prefix_len == 2 && prefix[0] == '#' && prefix[1] == ' ' && data[pos] == '#') {
+        size_t check_pos = pos + 1;
+        while (check_pos < len && is_whitespace(data[check_pos])) {
+          check_pos++;
         }
-        continue;
+        if (check_pos >= len || data[check_pos] == '\n' || (data[check_pos] == '\r' && check_pos + 1 < len && data[check_pos + 1] == '\n')) {
+          pos = check_pos;
+          if (pos < len) {
+            if (data[pos] == '\r') pos += 2;
+            else if (data[pos] == '\n') pos++;
+          }
+          stripped_bare_comment = true;
+          continue;
+        }
       }
-    }
 
-    // For "#' " prefix, check for bare "#'"
-    if (prefix_len == 3 && prefix[0] == '#' && prefix[1] == '\'' && prefix[2] == ' ' &&
-        pos + 2 <= len && data[pos] == '#' && data[pos + 1] == '\'') {
-      size_t check_pos = pos + 2;
-      // Skip optional whitespace after bare #'
-      while (check_pos < len && is_whitespace(data[check_pos])) {
-        check_pos++;
-      }
-      if (check_pos >= len || data[check_pos] == '\n' || (data[check_pos] == '\r' && check_pos + 1 < len && data[check_pos + 1] == '\n')) {
-        // It's bare "#'" - skip it
-        pos = check_pos;
-        if (pos < len) {
-          if (data[pos] == '\r') pos += 2;
-          else if (data[pos] == '\n') pos++;
+      // For "#' " prefix, check for bare "#'"
+      if (prefix_len == 3 && prefix[0] == '#' && prefix[1] == '\'' && prefix[2] == ' ' &&
+          pos + 2 <= len && data[pos] == '#' && data[pos + 1] == '\'') {
+        size_t check_pos = pos + 2;
+        while (check_pos < len && is_whitespace(data[check_pos])) {
+          check_pos++;
         }
-        continue;
+        if (check_pos >= len || data[check_pos] == '\n' || (data[check_pos] == '\r' && check_pos + 1 < len && data[check_pos + 1] == '\n')) {
+          pos = check_pos;
+          if (pos < len) {
+            if (data[pos] == '\r') pos += 2;
+            else if (data[pos] == '\n') pos++;
+          }
+          stripped_bare_comment = true;
+          continue;
+        }
+      }
+
+      // For "-- " prefix, check for bare "--"
+      if (prefix_len == 3 && prefix[0] == '-' && prefix[1] == '-' && prefix[2] == ' ' &&
+          pos + 2 <= len && data[pos] == '-' && data[pos + 1] == '-') {
+        size_t check_pos = pos + 2;
+        while (check_pos < len && is_whitespace(data[check_pos])) {
+          check_pos++;
+        }
+        if (check_pos >= len || data[check_pos] == '\n' || (data[check_pos] == '\r' && check_pos + 1 < len && data[check_pos + 1] == '\n')) {
+          pos = check_pos;
+          if (pos < len) {
+            if (data[pos] == '\r') pos += 2;
+            else if (data[pos] == '\n') pos++;
+          }
+          stripped_bare_comment = true;
+          continue;
+        }
       }
     }
 
@@ -347,6 +398,127 @@ std::string trim_leading_comment_lines(const std::string& body, const char* pref
 
   // Entire body was separator lines
   return "";
+}
+
+// Helper: Check for SQL block comment opening (/* --- or /* then newline then ---)
+// Returns 0 if not found, or content_start position if found. Sets is_compact and fence_chars_out.
+size_t check_sql_block_opening(const char* str, size_t len, bool& is_compact, const char*& fence_chars_out) {
+  if (len < 2 || str[0] != '/' || str[1] != '*') return 0;
+
+  size_t pos = 2;
+
+  // Check for compact form: "/* " then fence then whitespace until newline
+  if (pos < len && str[pos] == ' ') {
+    pos++;
+    // Check for fence at this position
+    const char* fence = nullptr;
+    if (pos + 3 <= len && memcmp(str + pos, "---", 3) == 0) {
+      fence = "---";
+    } else if (pos + 3 <= len && memcmp(str + pos, "+++", 3) == 0) {
+      fence = "+++";
+    }
+    if (fence) {
+      // Check that 4th char is not a fence char (e.g., "----" is invalid)
+      size_t after_fence = pos + 3;
+      if (after_fence < len && str[after_fence] == fence[0]) return 0;
+      // Only whitespace until newline/EOF
+      size_t i = after_fence;
+      while (i < len && is_whitespace(str[i])) i++;
+      if (i >= len || is_newline(str, i, len)) {
+        is_compact = true;
+        fence_chars_out = fence;
+        return skip_to_next_line(str, pos, len);
+      }
+    }
+  }
+
+  // Check for expanded form: "/*" then only whitespace until newline,
+  // then next line starts with fence
+  pos = 2;
+  while (pos < len && is_whitespace(str[pos])) pos++;
+  if (pos < len && is_newline(str, pos, len)) {
+    size_t next_line = skip_to_next_line(str, pos, len);
+    const char* fence = nullptr;
+    if (next_line + 3 <= len && memcmp(str + next_line, "---", 3) == 0) {
+      fence = "---";
+    } else if (next_line + 3 <= len && memcmp(str + next_line, "+++", 3) == 0) {
+      fence = "+++";
+    }
+    if (fence) {
+      // Check that 4th char is not a fence char
+      size_t after_fence = next_line + 3;
+      if (after_fence < len && str[after_fence] == fence[0]) return 0;
+      // Only whitespace until newline/EOF
+      size_t i = after_fence;
+      while (i < len && is_whitespace(str[i])) i++;
+      if (i >= len || is_newline(str, i, len)) {
+        is_compact = false;
+        fence_chars_out = fence;
+        return skip_to_next_line(str, next_line, len);
+      }
+    }
+  }
+
+  return 0;
+}
+
+// Helper: Find closing fence for SQL block comment format
+// Returns 0 if not found, or position of fence line start. Sets content_end.
+size_t find_sql_block_closing(const char* str, size_t start_pos, size_t len, const char* fence_chars, bool is_compact, size_t& content_end) {
+  size_t pos = start_pos;
+
+  while (pos < len) {
+    bool at_line_start = (pos == start_pos) || is_newline(str, pos - 1, len) || (pos >= 2 && is_newline(str, pos - 2, len));
+
+    if (at_line_start && pos + 3 <= len && memcmp(str + pos, fence_chars, 3) == 0) {
+      // Check 4th char is not a fence char (exactly 3)
+      size_t after_fence = pos + 3;
+      if (after_fence < len && str[after_fence] == fence_chars[0]) {
+        pos = skip_to_next_line(str, pos, len);
+        continue;
+      }
+
+      if (is_compact) {
+        // Compact closer: fence then exactly " */" then optional trailing whitespace
+        size_t i = after_fence;
+        if (i >= len || str[i] != ' ') {
+          pos = skip_to_next_line(str, pos, len);
+          continue;
+        }
+        i++;
+        if (i + 2 <= len && str[i] == '*' && str[i + 1] == '/') {
+          i += 2;
+          while (i < len && is_whitespace(str[i])) i++;
+          if (i >= len || is_newline(str, i, len)) {
+            content_end = pos;
+            return pos;
+          }
+        }
+      } else {
+        // Expanded closer: fence then only whitespace until newline,
+        // then next line has optional whitespace, then "*/" then whitespace until newline/EOF
+        size_t i = after_fence;
+        while (i < len && is_whitespace(str[i])) i++;
+        if (i >= len || is_newline(str, i, len)) {
+          size_t next_line = skip_to_next_line(str, i, len);
+          size_t j = next_line;
+          while (j < len && is_whitespace(str[j])) j++;
+          if (j + 2 <= len && str[j] == '*' && str[j + 1] == '/') {
+            j += 2;
+            while (j < len && is_whitespace(str[j])) j++;
+            if (j >= len || is_newline(str, j, len)) {
+              content_end = pos;
+              return pos;
+            }
+          }
+        }
+      }
+    }
+
+    pos = skip_to_next_line(str, pos, len);
+  }
+
+  return 0;
 }
 
 // Helper: Check if line starts with PEP 723 opening delimiter
@@ -496,6 +668,8 @@ list extract_front_matter_cpp(std::string text) {
   const char* comment_prefix = nullptr;
   size_t opening_end = 0;
   bool is_comment_wrapped = false;
+  bool is_sql_block = false;
+  bool sql_block_compact = false;
 
   // Try comment-wrapped YAML (# --- or #' ---)
   size_t comment_fence_len = check_comment_fence(str, 0, len, "---", &comment_prefix);
@@ -508,9 +682,11 @@ list extract_front_matter_cpp(std::string text) {
     if (check_pos >= len || is_newline(str, check_pos, len)) {
       fence_chars = "---";
       format = "yaml";
-      // Determine fence_type based on prefix: "# " -> yaml_comment, "#' " -> yaml_roxy
+      // Determine fence_type based on prefix: "# " -> yaml_comment, "-- " -> yaml_sql_line, "#' " -> yaml_roxy
       if (strcmp(comment_prefix, "# ") == 0) {
         fence_type = "yaml_comment";
+      } else if (strcmp(comment_prefix, "-- ") == 0) {
+        fence_type = "yaml_sql_line";
       } else {
         fence_type = "yaml_roxy";
       }
@@ -530,15 +706,32 @@ list extract_front_matter_cpp(std::string text) {
       if (check_pos >= len || is_newline(str, check_pos, len)) {
         fence_chars = "+++";
         format = "toml";
-        // Determine fence_type based on prefix: "# " -> toml_comment, "#' " -> toml_roxy
+        // Determine fence_type based on prefix: "# " -> toml_comment, "-- " -> toml_sql_line, "#' " -> toml_roxy
         if (strcmp(comment_prefix, "# ") == 0) {
           fence_type = "toml_comment";
+        } else if (strcmp(comment_prefix, "-- ") == 0) {
+          fence_type = "toml_sql_line";
         } else {
           fence_type = "toml_roxy";
         }
         is_comment_wrapped = true;
         opening_end = skip_to_next_line(str, 0, len);
       }
+    }
+  }
+
+  // Try SQL block comment (/* --- or /* then newline then ---)
+  if (!fence_chars) {
+    const char* sql_fence = nullptr;
+    size_t sql_content_start = check_sql_block_opening(str, len, sql_block_compact, sql_fence);
+    if (sql_content_start > 0) {
+      fence_chars = sql_fence;
+      format = (strcmp(fence_chars, "---") == 0) ? "yaml" : "toml";
+      fence_type = (strcmp(fence_chars, "---") == 0)
+        ? (sql_block_compact ? "yaml_sql_block_compact" : "yaml_sql_block_expanded")
+        : (sql_block_compact ? "toml_sql_block_compact" : "toml_sql_block_expanded");
+      is_sql_block = true;
+      opening_end = sql_content_start;
     }
   }
 
@@ -576,7 +769,9 @@ list extract_front_matter_cpp(std::string text) {
   size_t content_end;
   size_t closing_start;
 
-  if (is_comment_wrapped) {
+  if (is_sql_block) {
+    closing_start = find_sql_block_closing(str, opening_end, len, fence_chars, sql_block_compact, content_end);
+  } else if (is_comment_wrapped) {
     closing_start = find_comment_closing_fence(str, opening_end, len, fence_chars, comment_prefix, content_end);
   } else {
     closing_start = find_closing_fence(str, opening_end, len, fence_chars, content_end);
@@ -603,7 +798,14 @@ list extract_front_matter_cpp(std::string text) {
   }
 
   // Extract body (everything after closing fence line)
-  size_t body_start = skip_to_next_line(str, closing_start, len);
+  size_t body_start;
+  if (is_sql_block && !sql_block_compact) {
+    // Expanded: skip fence line, then skip */ line
+    size_t after_fence_line = skip_to_next_line(str, closing_start, len);
+    body_start = skip_to_next_line(str, after_fence_line, len);
+  } else {
+    body_start = skip_to_next_line(str, closing_start, len);
+  }
   std::string body;
   if (body_start < len) {
     body = text.substr(body_start);

@@ -32,6 +32,7 @@ main content by delimiter fences.
   - Standard [TOML](https://toml.io/en/) (`+++` delimiters)
   - Comment-wrapped formats for R and Python files (`#` and `#'`
     prefixes)
+  - SQL comment formats (`--` line comments and `/* */` block comments)
   - [PEP 723](https://peps.python.org/pep-0723/) Python [inline script
     metadata](https://packaging.python.org/en/latest/specifications/inline-script-metadata/#inline-script-metadata)
 - **Flexible parser integration** - use default parsers or provide your
@@ -163,6 +164,12 @@ Use these shortcuts with the `delimiter` argument:
 - `"yaml_comment"` / `"toml_comment"` - Comment-wrapped for scripts
   (`# ---` / `# +++`)
 - `"yaml_roxy"` / `"toml_roxy"` - Roxygen-style (`#' ---` / `#' +++`)
+- `"yaml_sql_line"` / `"toml_sql_line"` - SQL line comments (`-- ---` /
+  `-- +++`)
+- `"yaml_sql_block_compact"` / `"toml_sql_block_compact"` - SQL block
+  comments, compact (`/* ---` … `--- */`)
+- `"yaml_sql_block_expanded"` / `"toml_sql_block_expanded"` - SQL block
+  comments, expanded
 - `"toml_pep723"` - Python PEP 723 (`# /// script`)
 
 See the parsing examples earlier in this README to understand what each
@@ -267,6 +274,54 @@ str(parse_front_matter(text_py))
 #>  $ body: chr "import requests"
 #>  - attr(*, "format")= chr "toml"
 #>  - attr(*, "fence_type")= chr "toml_pep723"
+#>  - attr(*, "class")= chr "front_matter"
+```
+
+### SQL Front Matter
+
+SQL files support front matter using line comments or block comments:
+
+``` sql
+-- ---
+-- title: Sales Report
+-- author: Data Team
+-- ---
+
+SELECT * FROM sales
+```
+
+``` r
+str(parse_front_matter(text_sql))
+#> List of 2
+#>  $ data:List of 2
+#>   ..$ title : chr "Sales Report"
+#>   ..$ author: chr "Data Team"
+#>  $ body: chr "SELECT * FROM sales"
+#>  - attr(*, "format")= chr "yaml"
+#>  - attr(*, "fence_type")= chr "yaml_sql_line"
+#>  - attr(*, "class")= chr "front_matter"
+```
+
+Block comments are also supported in compact and expanded forms:
+
+``` sql
+/* ---
+title: Sales Report
+author: Data Team
+--- */
+
+SELECT * FROM sales
+```
+
+``` r
+str(parse_front_matter(text_sql_block))
+#> List of 2
+#>  $ data:List of 2
+#>   ..$ title : chr "Sales Report"
+#>   ..$ author: chr "Data Team"
+#>  $ body: chr "SELECT * FROM sales"
+#>  - attr(*, "format")= chr "yaml"
+#>  - attr(*, "fence_type")= chr "yaml_sql_block_compact"
 #>  - attr(*, "class")= chr "front_matter"
 ```
 
