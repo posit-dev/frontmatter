@@ -13,7 +13,7 @@ and
 ``` r
 format_front_matter(
   x,
-  delimiter = "yaml",
+  delimiter = NULL,
   format = "auto",
   format_yaml = NULL,
   format_toml = NULL
@@ -22,7 +22,7 @@ format_front_matter(
 write_front_matter(
   x,
   path = NULL,
-  delimiter = "yaml",
+  delimiter = NULL,
   ...,
   format = "auto",
   format_yaml = NULL,
@@ -46,7 +46,14 @@ write_front_matter(
 
   A character string specifying the fence style, or a character vector
   for custom delimiters. See **Delimiter Formats** for available
-  options.
+  options. When `NULL` (the default), the delimiter is inferred
+  automatically: if `x` was returned by
+  [`parse_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/parse_front_matter.md)
+  or
+  [`read_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/parse_front_matter.md),
+  the original fence style is preserved; otherwise
+  `write_front_matter()` falls back to the file extension of `path`, and
+  finally to `"yaml"`.
 
 - format:
 
@@ -150,6 +157,27 @@ For comment-prefixed formats (like `yaml_comment`, `yaml_roxy`, or
 closing fence and the body when the body starts with the same comment
 prefix, ensuring clean roundtrip behavior.
 
+When `delimiter` is `NULL` (the default), the delimiter is inferred
+automatically, making roundtrips seamless:
+
+- `format_front_matter()` uses the `fence_type` attribute preserved by
+  [`parse_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/parse_front_matter.md)
+  and
+  [`read_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/parse_front_matter.md),
+  so the output uses the same fence style as the original document.
+
+- `write_front_matter()` additionally falls back to a built-in
+  extension-to-delimiter map when the input has no `fence_type`
+  attribute:
+
+|                       |                            |
+|-----------------------|----------------------------|
+| Extension             | Default delimiter          |
+| `.sql`                | `"yaml_sql_block_compact"` |
+| `.py`                 | `"toml_pep723"`            |
+| `.R`                  | `"yaml_roxy"`              |
+| `.md`, `.qmd`, `.Rmd` | `"yaml"`                   |
+
 ## See also
 
 [`parse_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/parse_front_matter.md)
@@ -166,11 +194,11 @@ doc <- list(
   body = "Document content goes here."
 )
 
-# Format as a string
+# Format as a string (delimiter inferred from fence_type attr, falls back to yaml)
 format_front_matter(doc)
 #> [1] "---\ntitle: My Document\nauthor: Jane Doe\n---\n\nDocument content goes here.\n"
 
-# Write to a file
+# Write to a file (delimiter inferred from .md extension -> yaml)
 tmp <- tempfile(fileext = ".md")
 write_front_matter(doc, tmp)
 readLines(tmp)
@@ -187,11 +215,11 @@ write_front_matter(doc)
 #> 
 #> Document content goes here.
 
-# Use TOML format
+# Use TOML format explicitly
 format_front_matter(doc, delimiter = "toml")
 #> [1] "+++\ntitle = \"My Document\"\nauthor = \"Jane Doe\"\n+++\n\nDocument content goes here.\n"
 
-# Use comment-wrapped format for R scripts
+# Use comment-wrapped format for R scripts explicitly
 r_script <- list(
   data = list(title = "Analysis Script"),
   body = "# Load libraries\nlibrary(dplyr)"
@@ -199,14 +227,22 @@ r_script <- list(
 format_front_matter(r_script, delimiter = "yaml_comment")
 #> [1] "# ---\n# title: Analysis Script\n# ---\n#\n# Load libraries\nlibrary(dplyr)\n"
 
-# Roundtrip example: read, modify, write
-original <- "---
-title: Original
----
-Content here"
+# Write to an R file: delimiter inferred from .R extension -> yaml_roxy
+tmp_r <- tempfile(fileext = ".R")
+write_front_matter(r_script, tmp_r)
+readLines(tmp_r)
+#> [1] "#' ---"                    "#' title: Analysis Script"
+#> [3] "#' ---"                    ""                         
+#> [5] "# Load libraries"          "library(dplyr)"           
+
+# Roundtrip: delimiter is automatically preserved from the original format
+original <- "# ---
+# title: Original
+# ---
+# R code here"
 
 doc <- parse_front_matter(original)
 doc$data$title <- "Modified"
-format_front_matter(doc)
-#> [1] "---\ntitle: Modified\n---\n\nContent here\n"
+format_front_matter(doc) # uses yaml_comment, matching the source
+#> [1] "# ---\n# title: Modified\n# ---\n#\n# R code here\n"
 ```
