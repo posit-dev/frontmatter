@@ -134,6 +134,22 @@ formats (like \code{yaml_comment}, \code{yaml_roxy}, or \code{yaml_sql_line}), a
 line is automatically inserted between the closing fence and the body when
 the body starts with the same comment prefix, ensuring clean roundtrip
 behavior.
+
+When \code{delimiter} is \code{NULL} (the default), the delimiter is inferred
+automatically, making roundtrips seamless:
+\itemize{
+\item \code{format_front_matter()} uses the \code{fence_type} attribute preserved by
+\code{\link[=parse_front_matter]{parse_front_matter()}} and \code{\link[=read_front_matter]{read_front_matter()}}, so the output uses the
+same fence style as the original document.
+\item \code{write_front_matter()} additionally falls back to a built-in
+extension-to-delimiter map when the input has no \code{fence_type} attribute:
+}\tabular{ll}{
+   Extension \tab Default delimiter \cr
+   \code{.sql} \tab \code{"yaml_sql_block_compact"} \cr
+   \code{.py} \tab \code{"toml_pep723"} \cr
+   \code{.R} \tab \code{"yaml_comment"} \cr
+   \code{.md}, \code{.qmd}, \code{.Rmd} \tab \code{"yaml"} \cr
+}
 }
 
 \examples{
@@ -143,10 +159,10 @@ doc <- list(
   body = "Document content goes here."
 )
 
-# Format as a string
+# Format as a string (delimiter inferred from fence_type attr, falls back to yaml)
 format_front_matter(doc)
 
-# Write to a file
+# Write to a file (delimiter inferred from .md extension -> yaml)
 tmp <- tempfile(fileext = ".md")
 write_front_matter(doc, tmp)
 readLines(tmp)
@@ -154,25 +170,30 @@ readLines(tmp)
 # Print to console (when path is NULL)
 write_front_matter(doc)
 
-# Use TOML format
+# Use TOML format explicitly
 format_front_matter(doc, delimiter = "toml")
 
-# Use comment-wrapped format for R scripts
+# Use comment-wrapped format for R scripts explicitly
 r_script <- list(
   data = list(title = "Analysis Script"),
   body = "# Load libraries\nlibrary(dplyr)"
 )
 format_front_matter(r_script, delimiter = "yaml_comment")
 
-# Roundtrip example: read, modify, write
-original <- "---
-title: Original
----
-Content here"
+# Write to an R file: delimiter inferred from .R extension -> yaml_comment
+tmp_r <- tempfile(fileext = ".R")
+write_front_matter(r_script, tmp_r)
+readLines(tmp_r)
+
+# Roundtrip: delimiter is automatically preserved from the original format
+original <- "# ---
+# title: Original
+# ---
+# R code here"
 
 doc <- parse_front_matter(original)
 doc$data$title <- "Modified"
-format_front_matter(doc)
+format_front_matter(doc) # uses yaml_comment, matching the source
 
 }
 \seealso{

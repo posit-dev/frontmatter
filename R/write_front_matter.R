@@ -61,6 +61,22 @@
 #' the body starts with the same comment prefix, ensuring clean roundtrip
 #' behavior.
 #'
+#' When `delimiter` is `NULL` (the default), the delimiter is inferred
+#' automatically, making roundtrips seamless:
+#'
+#' - `format_front_matter()` uses the `fence_type` attribute preserved by
+#'   [parse_front_matter()] and [read_front_matter()], so the output uses the
+#'   same fence style as the original document.
+#' - `write_front_matter()` additionally falls back to a built-in
+#'   extension-to-delimiter map when the input has no `fence_type` attribute:
+#'
+#' | Extension | Default delimiter |
+#' |-----------|------------------|
+#' | `.sql` | `"yaml_sql_block_compact"` |
+#' | `.py` | `"toml_pep723"` |
+#' | `.R` | `"yaml_comment"` |
+#' | `.md`, `.qmd`, `.Rmd` | `"yaml"` |
+#'
 #' @examples
 #' # Create a document with YAML front matter
 #' doc <- list(
@@ -68,10 +84,10 @@
 #'   body = "Document content goes here."
 #' )
 #'
-#' # Format as a string
+#' # Format as a string (delimiter inferred from fence_type attr, falls back to yaml)
 #' format_front_matter(doc)
 #'
-#' # Write to a file
+#' # Write to a file (delimiter inferred from .md extension -> yaml)
 #' tmp <- tempfile(fileext = ".md")
 #' write_front_matter(doc, tmp)
 #' readLines(tmp)
@@ -79,25 +95,30 @@
 #' # Print to console (when path is NULL)
 #' write_front_matter(doc)
 #'
-#' # Use TOML format
+#' # Use TOML format explicitly
 #' format_front_matter(doc, delimiter = "toml")
 #'
-#' # Use comment-wrapped format for R scripts
+#' # Use comment-wrapped format for R scripts explicitly
 #' r_script <- list(
 #'   data = list(title = "Analysis Script"),
 #'   body = "# Load libraries\nlibrary(dplyr)"
 #' )
 #' format_front_matter(r_script, delimiter = "yaml_comment")
 #'
-#' # Roundtrip example: read, modify, write
-#' original <- "---
-#' title: Original
-#' ---
-#' Content here"
+#' # Write to an R file: delimiter inferred from .R extension -> yaml_comment
+#' tmp_r <- tempfile(fileext = ".R")
+#' write_front_matter(r_script, tmp_r)
+#' readLines(tmp_r)
+#'
+#' # Roundtrip: delimiter is automatically preserved from the original format
+#' original <- "# ---
+#' # title: Original
+#' # ---
+#' # R code here"
 #'
 #' doc <- parse_front_matter(original)
 #' doc$data$title <- "Modified"
-#' format_front_matter(doc)
+#' format_front_matter(doc) # uses yaml_comment, matching the source
 #'
 #' @param x A list with `data` and `body` elements, typically as returned by
 #'   [parse_front_matter()] or [read_front_matter()]. The `data` element
