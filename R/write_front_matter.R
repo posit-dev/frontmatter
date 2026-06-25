@@ -163,8 +163,9 @@ format_front_matter <- function(
   # computed against the post-shebang body (applied only when data is non-null)
   body_main <- body
   potential_shebang <- NULL
+  is_script_prefix <- prefix %in% c("# ", "#' ", "-- ")
   if (
-    nzchar(prefix) && !is.null(body) && nzchar(body) && startsWith(body, "#!")
+    is_script_prefix && !is.null(body) && nzchar(body) && startsWith(body, "#!")
   ) {
     nl_pos <- regexpr("\n", body, fixed = TRUE)
     if (nl_pos > 0) {
