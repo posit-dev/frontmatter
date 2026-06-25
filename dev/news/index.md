@@ -2,6 +2,18 @@
 
 ## frontmatter (development version)
 
+- Added support for shebang lines (`#!`) at the start of files. When a
+  file begins with a shebang, the parser now recognizes front matter in
+  comment-wrapped formats (`# ---`, `#' ---`) and PEP 723
+  (`# /// script`) immediately following the shebang (with zero or one
+  blank lines in between). The shebang line is included in the returned
+  `body`.
+  [`format_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/format_front_matter.md)
+  and
+  [`write_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/format_front_matter.md)
+  also move a leading shebang line above the front matter block when
+  writing ([\#5](https://github.com/posit-dev/frontmatter/issues/5)).
+
 - Added SQL front matter support with two comment styles: line comments
   (`-- ---`/`-- +++`) and block comments in compact (`/* ---` …
   `--- */`) and expanded (`/*` + `---` … `---` + `*/`) forms. Six new
