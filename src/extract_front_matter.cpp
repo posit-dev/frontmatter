@@ -556,13 +556,13 @@ bool is_pep723_closing(const char* str, size_t pos, size_t len) {
 }
 
 // Helper: Extract PEP 723 content
-list extract_pep723(const std::string& text) {
+list extract_pep723(const std::string& text, size_t start_pos, const std::string& shebang_prefix) {
   const char* str = text.c_str();
   size_t len = text.length();
   writable::list result;
 
-  // Check for opening at position 0
-  if (!is_pep723_opening(str, 0, len)) {
+  // Check for opening at start_pos
+  if (!is_pep723_opening(str, start_pos, len)) {
     result.push_back({"found"_nm = false});
     result.push_back({"format"_nm = "none"});
     result.push_back({"fence_type"_nm = "none"});
@@ -572,7 +572,7 @@ list extract_pep723(const std::string& text) {
   }
 
   // Skip opening line
-  size_t pos = skip_to_next_line(str, 0, len);
+  size_t pos = skip_to_next_line(str, start_pos, len);
   size_t content_start = pos;
 
   // Find closing delimiter and validate all lines in between
@@ -595,6 +595,7 @@ list extract_pep723(const std::string& text) {
         // Use trim_leading_comment_lines to handle bare "#" separator lines
         body = trim_leading_comment_lines(body, "# ");
       }
+      body = shebang_prefix + body;
 
       result.push_back({"found"_nm = true});
       result.push_back({"format"_nm = "toml"});
@@ -656,12 +657,45 @@ list extract_front_matter_cpp(std::string text) {
     return result;
   }
 
-  // Check for PEP 723 format first (has most specific opening)
-  if (is_pep723_opening(str, 0, len)) {
-    return extract_pep723(text);
+  // Shebang detection: if file starts with "#!", skip it and allow 0-1 blank lines
+  // before comment-wrapped opening fence
+  size_t search_start = 0;
+  std::string shebang_prefix;
+  bool has_shebang = false;
+
+  if (len >= 2 && str[0] == '#' && str[1] == '!') {
+    size_t after_shebang = skip_to_next_line(str, 0, len);
+    size_t pos = after_shebang;
+    int blank_count = 0;
+
+    while (pos < len) {
+      size_t line_start = pos;
+      while (pos < len && is_whitespace(str[pos])) pos++;
+
+      if (pos >= len) break;
+
+      if (is_newline(str, pos, len)) {
+        blank_count++;
+        pos = skip_to_next_line(str, pos, len);
+        if (blank_count > 1) break;
+      } else {
+        if (blank_count <= 1) {
+          has_shebang = true;
+          search_start = line_start;
+          shebang_prefix = text.substr(0, after_shebang);
+        }
+        break;
+      }
+    }
   }
 
-  // Check for opening fence at position 0
+  // Check for PEP 723 format first (has most specific opening)
+  size_t pep723_search = has_shebang ? search_start : 0;
+  if (is_pep723_opening(str, pep723_search, len)) {
+    return extract_pep723(text, pep723_search, shebang_prefix);
+  }
+
+  // Check for opening fence at position 0 (or after shebang for comment-wrapped)
   const char* fence_chars = nullptr;
   std::string format;
   std::string fence_type;
@@ -671,18 +705,18 @@ list extract_front_matter_cpp(std::string text) {
   bool is_sql_block = false;
   bool sql_block_compact = false;
 
+  size_t comment_search = has_shebang ? search_start : 0;
+
   // Try comment-wrapped YAML (# --- or #' ---)
-  size_t comment_fence_len = check_comment_fence(str, 0, len, "---", &comment_prefix);
+  size_t comment_fence_len = check_comment_fence(str, comment_search, len, "---", &comment_prefix);
   if (comment_fence_len > 0) {
-    // Validate it's a complete fence line
-    size_t check_pos = comment_fence_len;
+    size_t check_pos = comment_search + comment_fence_len;
     while (check_pos < len && is_whitespace(str[check_pos])) {
       check_pos++;
     }
     if (check_pos >= len || is_newline(str, check_pos, len)) {
       fence_chars = "---";
       format = "yaml";
-      // Determine fence_type based on prefix: "# " -> yaml_comment, "-- " -> yaml_sql_line, "#' " -> yaml_roxy
       if (strcmp(comment_prefix, "# ") == 0) {
         fence_type = "yaml_comment";
       } else if (strcmp(comment_prefix, "-- ") == 0) {
@@ -691,22 +725,21 @@ list extract_front_matter_cpp(std::string text) {
         fence_type = "yaml_roxy";
       }
       is_comment_wrapped = true;
-      opening_end = skip_to_next_line(str, 0, len);
+      opening_end = skip_to_next_line(str, comment_search, len);
     }
   }
 
   // Try comment-wrapped TOML (# +++ or #' +++)
   if (!fence_chars) {
-    comment_fence_len = check_comment_fence(str, 0, len, "+++", &comment_prefix);
+    comment_fence_len = check_comment_fence(str, comment_search, len, "+++", &comment_prefix);
     if (comment_fence_len > 0) {
-      size_t check_pos = comment_fence_len;
+      size_t check_pos = comment_search + comment_fence_len;
       while (check_pos < len && is_whitespace(str[check_pos])) {
         check_pos++;
       }
       if (check_pos >= len || is_newline(str, check_pos, len)) {
         fence_chars = "+++";
         format = "toml";
-        // Determine fence_type based on prefix: "# " -> toml_comment, "-- " -> toml_sql_line, "#' " -> toml_roxy
         if (strcmp(comment_prefix, "# ") == 0) {
           fence_type = "toml_comment";
         } else if (strcmp(comment_prefix, "-- ") == 0) {
@@ -715,7 +748,7 @@ list extract_front_matter_cpp(std::string text) {
           fence_type = "toml_roxy";
         }
         is_comment_wrapped = true;
-        opening_end = skip_to_next_line(str, 0, len);
+        opening_end = skip_to_next_line(str, comment_search, len);
       }
     }
   }
@@ -815,6 +848,11 @@ list extract_front_matter_cpp(std::string text) {
     } else {
       body = trim_leading_empty_lines(body);
     }
+  }
+
+  // Prepend shebang line to body for comment-wrapped formats
+  if (has_shebang && is_comment_wrapped) {
+    body = shebang_prefix + body;
   }
 
   result.push_back({"found"_nm = true});

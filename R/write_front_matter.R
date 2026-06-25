@@ -156,7 +156,25 @@ format_front_matter <- function(
   body <- x$body
   closer <- delimiter[3]
   space_line <- NULL
+  shebang <- NULL
   data <- c()
+
+  # Pre-detect shebang for comment-prefixed delimiters so that space_line is
+  # computed against the post-shebang body (applied only when data is non-null)
+  body_main <- body
+  potential_shebang <- NULL
+  if (
+    nzchar(prefix) && !is.null(body) && nzchar(body) && startsWith(body, "#!")
+  ) {
+    nl_pos <- regexpr("\n", body, fixed = TRUE)
+    if (nl_pos > 0) {
+      potential_shebang <- sub("\r$", "", substring(body, 1, nl_pos - 1))
+      body_main <- substring(body, nl_pos + 1)
+    } else {
+      potential_shebang <- body
+      body_main <- NULL
+    }
+  }
 
   if (!is.null(x$data)) {
     data <- switch(
@@ -175,16 +193,18 @@ format_front_matter <- function(
     if (nzchar(data)) {
       space_line <- ""
 
-      if (!is.null(body) && !identical(prefix, "")) {
+      body_for_spaceline <- if (!is.null(potential_shebang)) body_main else body
+      if (!is.null(body_for_spaceline) && !identical(prefix, "")) {
         trimmed <- trimws(prefix, "right")
-        starts_with_prefix <- substring(body, 1, nchar(prefix)) == prefix
+        starts_with_prefix <- substring(body_for_spaceline, 1, nchar(prefix)) ==
+          prefix
         starts_with_bare <- grepl(
           paste0(
             "^",
             gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", trimmed),
             "[ \t]*(\r?\n|$)"
           ),
-          body
+          body_for_spaceline
         )
         if (starts_with_prefix || starts_with_bare) {
           space_line <- trimmed
@@ -197,10 +217,17 @@ format_front_matter <- function(
     }
   }
 
+  # Apply shebang: move to top when writing front matter
+  if (!is.null(data) && !is.null(potential_shebang)) {
+    shebang <- potential_shebang
+    body <- body_main
+  }
+
   lines <- if (is.null(data)) {
     body
   } else {
     c(
+      shebang,
       opener,
       if (nzchar(prefix)) paste0(prefix, data) else data,
       closer,
