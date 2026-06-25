@@ -106,7 +106,10 @@
 #'
 #' @param delimiter A character string specifying the fence style, or a
 #'   character vector for custom delimiters. See **Delimiter Formats** for
-#'   available options.
+#'   available options. When `NULL` (the default), the delimiter is inferred:
+#'   first from the `fence_type` attribute of `x` (set by [parse_front_matter()]
+#'   and [read_front_matter()]), then from the file extension of `path` (for
+#'   `write_front_matter()` only), and finally falling back to `"yaml"`.
 #'
 #' @param format The serialization format: `"auto"` (detect from delimiter),
 #'   `"yaml"`, or `"toml"`. Usually auto-detection works well.
@@ -128,7 +131,7 @@
 #' @export
 format_front_matter <- function(
   x,
-  delimiter = "yaml",
+  delimiter = NULL,
   format = "auto",
   format_yaml = NULL,
   format_toml = NULL
@@ -139,6 +142,7 @@ format_front_matter <- function(
     )
   }
   check_character(x$body, allow_null = TRUE)
+  delimiter <- infer_delimiter(delimiter, x)
   check_character(delimiter, allow_na = FALSE)
   check_function(format_yaml, allow_null = TRUE)
   check_function(format_toml, allow_null = TRUE)
@@ -259,15 +263,16 @@ format_front_matter <- function(
 write_front_matter <- function(
   x,
   path = NULL,
-  delimiter = "yaml",
+  delimiter = NULL,
   ...,
   format = "auto",
   format_yaml = NULL,
   format_toml = NULL
 ) {
+  ext <- if (!is.null(path)) tools::file_ext(path) else NULL
   content <- format_front_matter(
     x = x,
-    delimiter = delimiter,
+    delimiter = infer_delimiter(delimiter, x, ext),
     format = format,
     format_yaml = format_yaml,
     format_toml = format_toml
@@ -337,4 +342,31 @@ is_yaml_delimiter <- function(delimiter) {
 
 is_toml_delimiter <- function(delimiter) {
   grepl("\\+\\+\\+$", delimiter[1]) || grepl("/// script$", delimiter[1])
+}
+
+infer_delimiter <- function(delimiter, x, ext = NULL) {
+  if (!is.null(delimiter)) {
+    return(delimiter)
+  }
+
+  fence_type <- attr(x, "fence_type", exact = TRUE)
+  if (!is.null(fence_type) && nzchar(fence_type) && fence_type != "none") {
+    return(fence_type)
+  }
+
+  if (!is.null(ext) && nzchar(ext)) {
+    mapped <- switch(
+      tolower(ext),
+      sql = "yaml_sql_block_compact",
+      py = "toml_pep723",
+      r = "yaml_comment",
+      rmd = "yaml",
+      qmd = "yaml",
+      md = "yaml",
+      NULL
+    )
+    if (!is.null(mapped)) return(mapped)
+  }
+
+  "yaml"
 }

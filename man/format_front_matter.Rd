@@ -7,7 +7,7 @@
 \usage{
 format_front_matter(
   x,
-  delimiter = "yaml",
+  delimiter = NULL,
   format = "auto",
   format_yaml = NULL,
   format_toml = NULL
@@ -16,7 +16,7 @@ format_front_matter(
 write_front_matter(
   x,
   path = NULL,
-  delimiter = "yaml",
+  delimiter = NULL,
   ...,
   format = "auto",
   format_yaml = NULL,
@@ -31,7 +31,10 @@ and \code{body} contains the document content (can be \code{NULL} or empty).}
 
 \item{delimiter}{A character string specifying the fence style, or a
 character vector for custom delimiters. See \strong{Delimiter Formats} for
-available options.}
+available options. When \code{NULL} (the default), the delimiter is inferred:
+first from the \code{fence_type} attribute of \code{x} (set by \code{\link[=parse_front_matter]{parse_front_matter()}}
+and \code{\link[=read_front_matter]{read_front_matter()}}), then from the file extension of \code{path} (for
+\code{write_front_matter()} only), and finally falling back to \code{"yaml"}.}
 
 \item{format}{The serialization format: \code{"auto"} (detect from delimiter),
 \code{"yaml"}, or \code{"toml"}. Usually auto-detection works well.}
