@@ -97,6 +97,39 @@ The opening fence must satisfy ALL of the following:
    - Any non-whitespace characters invalidate the fence: `---invalid\n` ✗
    - Must end with a newline character OR be at document end
 
+### Shebang Lines
+
+When a file begins with a shebang line (`#!` as the very first characters), the parser allows comment-wrapped formats and PEP 723 to begin after the shebang:
+
+- **Applicable formats**: Comment-wrapped YAML/TOML (`# ---`, `#' ---`, `-- ---`) and PEP 723 (`# /// script`). Standard `---` and `+++` fences still require position 0.
+- **Blank line tolerance**: Zero or one blank lines are allowed between the shebang and the opening fence. Two or more blank lines → no front matter found.
+- **Returned body**: The shebang line is included at the start of the returned `body`. The blank line (if present) between shebang and fence is consumed and not included in the body.
+- **Writing**: `format_front_matter()` and `write_front_matter()` move a leading shebang line above the opening fence for comment-prefixed delimiters. Tight spacing is used (no blank line between shebang and opener).
+
+**Examples:**
+
+```sh
+#!/usr/bin/env bash
+# ---
+# title: My Script
+# ---
+```
+
+```sh
+#!/usr/bin/env bash
+
+# ---
+# title: My Script
+# ---
+```
+
+```python
+#!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.11"
+# ///
+```
+
 ### Closing Fence Requirements
 
 The closing fence must satisfy ALL of the following:
