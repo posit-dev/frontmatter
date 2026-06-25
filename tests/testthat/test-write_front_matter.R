@@ -536,7 +536,7 @@ test_that("write_front_matter() infers delimiter from .R extension", {
 
   write_front_matter(doc, tmp)
   content <- paste(readLines(tmp, warn = FALSE), collapse = "\n")
-  expect_true(startsWith(content, "# ---"))
+  expect_true(startsWith(content, "#' ---"))
 })
 
 test_that("write_front_matter() infers delimiter from .py extension", {

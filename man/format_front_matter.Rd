@@ -31,10 +31,11 @@ and \code{body} contains the document content (can be \code{NULL} or empty).}
 
 \item{delimiter}{A character string specifying the fence style, or a
 character vector for custom delimiters. See \strong{Delimiter Formats} for
-available options. When \code{NULL} (the default), the delimiter is inferred:
-first from the \code{fence_type} attribute of \code{x} (set by \code{\link[=parse_front_matter]{parse_front_matter()}}
-and \code{\link[=read_front_matter]{read_front_matter()}}), then from the file extension of \code{path} (for
-\code{write_front_matter()} only), and finally falling back to \code{"yaml"}.}
+available options. When \code{NULL} (the default), the delimiter is inferred
+automatically: if \code{x} was returned by \code{\link[=parse_front_matter]{parse_front_matter()}} or
+\code{\link[=read_front_matter]{read_front_matter()}}, the original fence style is preserved; otherwise
+\code{write_front_matter()} falls back to the file extension of \code{path}, and
+finally to \code{"yaml"}.}
 
 \item{format}{The serialization format: \code{"auto"} (detect from delimiter),
 \code{"yaml"}, or \code{"toml"}. Usually auto-detection works well.}
@@ -147,7 +148,7 @@ extension-to-delimiter map when the input has no \code{fence_type} attribute:
    Extension \tab Default delimiter \cr
    \code{.sql} \tab \code{"yaml_sql_block_compact"} \cr
    \code{.py} \tab \code{"toml_pep723"} \cr
-   \code{.R} \tab \code{"yaml_comment"} \cr
+   \code{.R} \tab \code{"yaml_roxy"} \cr
    \code{.md}, \code{.qmd}, \code{.Rmd} \tab \code{"yaml"} \cr
 }
 }

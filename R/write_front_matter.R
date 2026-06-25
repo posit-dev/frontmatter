@@ -74,7 +74,7 @@
 #' |-----------|------------------|
 #' | `.sql` | `"yaml_sql_block_compact"` |
 #' | `.py` | `"toml_pep723"` |
-#' | `.R` | `"yaml_comment"` |
+#' | `.R` | `"yaml_roxy"` |
 #' | `.md`, `.qmd`, `.Rmd` | `"yaml"` |
 #'
 #' @examples
@@ -127,10 +127,11 @@
 #'
 #' @param delimiter A character string specifying the fence style, or a
 #'   character vector for custom delimiters. See **Delimiter Formats** for
-#'   available options. When `NULL` (the default), the delimiter is inferred:
-#'   first from the `fence_type` attribute of `x` (set by [parse_front_matter()]
-#'   and [read_front_matter()]), then from the file extension of `path` (for
-#'   `write_front_matter()` only), and finally falling back to `"yaml"`.
+#'   available options. When `NULL` (the default), the delimiter is inferred
+#'   automatically: if `x` was returned by [parse_front_matter()] or
+#'   [read_front_matter()], the original fence style is preserved; otherwise
+#'   `write_front_matter()` falls back to the file extension of `path`, and
+#'   finally to `"yaml"`.
 #'
 #' @param format The serialization format: `"auto"` (detect from delimiter),
 #'   `"yaml"`, or `"toml"`. Usually auto-detection works well.
@@ -380,7 +381,7 @@ infer_delimiter <- function(delimiter, x, ext = NULL) {
       tolower(ext),
       sql = "yaml_sql_block_compact",
       py = "toml_pep723",
-      r = "yaml_comment",
+      r = "yaml_roxy",
       rmd = "yaml",
       qmd = "yaml",
       md = "yaml",
