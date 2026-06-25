@@ -20,6 +20,7 @@ main content by delimiter fences.
   - Standard [TOML](https://toml.io/en/) (`+++` delimiters)
   - Comment-wrapped formats for R and Python files (`#` and `#'`
     prefixes)
+  - SQL comment formats (`--` line comments and `/* */` block comments)
   - [PEP 723](https://peps.python.org/pep-0723/) Python [inline script
     metadata](https://packaging.python.org/en/latest/specifications/inline-script-metadata/#inline-script-metadata)
 - **Flexible parser integration** - use default parsers or provide your
@@ -33,6 +34,7 @@ main content by delimiter fences.
 You can install frontmatter from CRAN with:
 
 ``` r
+
 install.packages("frontmatter")
 ```
 
@@ -40,6 +42,7 @@ To install the latest development version, you can install from
 [posit-dev.r-universe.dev](https://posit-dev.r-universe.dev/):
 
 ``` r
+
 # install.packages("pak")
 
 pak::repo_add("https://posit-dev.r-universe.dev")
@@ -50,6 +53,7 @@ Or you can install the development version from
 [GitHub](https://github.com/posit-dev/frontmatter):
 
 ``` r
+
 pak::pak("posit-dev/frontmatter")
 ```
 
@@ -70,6 +74,7 @@ Document content starts here.
 ```
 
 ``` r
+
 str(parse_front_matter(text_yaml))
 #> List of 2
 #>  $ data:List of 3
@@ -85,6 +90,7 @@ str(parse_front_matter(text_yaml))
 ### Parse from File
 
 ``` r
+
 result <- read_front_matter("document.md")
 ```
 
@@ -104,6 +110,7 @@ you to programmatically create or modify documents with front matter.
 #### Basic Writing
 
 ``` r
+
 # Create a document structure
 doc <- list(
   data = list(title = "My Document", author = "Jane Doe"),
@@ -135,6 +142,7 @@ write_front_matter(doc, path = NULL)
 #### Roundtrip Modification
 
 ``` r
+
 # Start with the text_yaml variable from earlier
 doc <- parse_front_matter(text_yaml)
 
@@ -157,12 +165,19 @@ Use these shortcuts with the `delimiter` argument:
 - `"yaml_comment"` / `"toml_comment"` - Comment-wrapped for scripts
   (`# ---` / `# +++`)
 - `"yaml_roxy"` / `"toml_roxy"` - Roxygen-style (`#' ---` / `#' +++`)
+- `"yaml_sql_line"` / `"toml_sql_line"` - SQL line comments (`-- ---` /
+  `-- +++`)
+- `"yaml_sql_block_compact"` / `"toml_sql_block_compact"` - SQL block
+  comments, compact (`/* ---` … `--- */`)
+- `"yaml_sql_block_expanded"` / `"toml_sql_block_expanded"` - SQL block
+  comments, expanded
 - `"toml_pep723"` - Python PEP 723 (`# /// script`)
 
 See the parsing examples earlier in this README to understand what each
 format looks like. Here’s a quick example with TOML:
 
 ``` r
+
 # Use TOML format
 format_front_matter(doc, delimiter = "toml")
 #> [1] "+++\ntitle = \"Modified Title\"\ndate = \"2024-01-01\"\ntags = [\"tutorial\", \"R\"]\nauthor = \"New Author\"\n+++\n\nDocument content starts here.\n"
@@ -180,6 +195,7 @@ Content here
 ```
 
 ``` r
+
 str(parse_front_matter(text_toml))
 #> List of 2
 #>  $ data:List of 2
@@ -196,6 +212,7 @@ str(parse_front_matter(text_toml))
 For R and Python files, front matter can be wrapped in comments:
 
 ``` r
+
 # ---
 # title: My Analysis
 # author: Data Scientist
@@ -206,6 +223,7 @@ library(dplyr)
 ```
 
 ``` r
+
 str(parse_front_matter(text_r))
 #> List of 2
 #>  $ data:List of 2
@@ -220,6 +238,7 @@ str(parse_front_matter(text_r))
 Roxygen-style comments are also supported:
 
 ``` r
+
 #' ---
 #' title: My Function
 #' ---
@@ -228,6 +247,7 @@ Roxygen-style comments are also supported:
 ```
 
 ``` r
+
 str(parse_front_matter(text_roxy))
 #> List of 2
 #>  $ data:List of 1
@@ -252,6 +272,7 @@ import requests
 ```
 
 ``` r
+
 str(parse_front_matter(text_py))
 #> List of 2
 #>  $ data:List of 2
@@ -264,9 +285,60 @@ str(parse_front_matter(text_py))
 #>  - attr(*, "class")= chr "front_matter"
 ```
 
+### SQL Front Matter
+
+SQL files support front matter using line comments or block comments:
+
+``` sql
+-- ---
+-- title: Sales Report
+-- author: Data Team
+-- ---
+
+SELECT * FROM sales
+```
+
+``` r
+
+str(parse_front_matter(text_sql))
+#> List of 2
+#>  $ data:List of 2
+#>   ..$ title : chr "Sales Report"
+#>   ..$ author: chr "Data Team"
+#>  $ body: chr "SELECT * FROM sales"
+#>  - attr(*, "format")= chr "yaml"
+#>  - attr(*, "fence_type")= chr "yaml_sql_line"
+#>  - attr(*, "class")= chr "front_matter"
+```
+
+Block comments are also supported in compact and expanded forms:
+
+``` sql
+/* ---
+title: Sales Report
+author: Data Team
+--- */
+
+SELECT * FROM sales
+```
+
+``` r
+
+str(parse_front_matter(text_sql_block))
+#> List of 2
+#>  $ data:List of 2
+#>   ..$ title : chr "Sales Report"
+#>   ..$ author: chr "Data Team"
+#>  $ body: chr "SELECT * FROM sales"
+#>  - attr(*, "format")= chr "yaml"
+#>  - attr(*, "fence_type")= chr "yaml_sql_block_compact"
+#>  - attr(*, "class")= chr "front_matter"
+```
+
 ### Custom Parsers
 
 ``` r
+
 # Get raw YAML without parsing
 str(parse_front_matter(text_yaml, parse_yaml = identity))
 #> List of 2
@@ -329,6 +401,7 @@ Content
 ```
 
 ``` r
+
 # Default (YAML 1.2): 'yes' is a string
 parse_front_matter(text_yaml11)$data
 #> $enabled
@@ -349,6 +422,7 @@ Incomplete front matter returns `NULL` as data and the original content
 unchanged:
 
 ``` r
+
 text <- "---\nNot valid front matter"
 str(parse_front_matter(text))
 #> List of 2

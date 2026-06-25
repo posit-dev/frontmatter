@@ -2,7 +2,19 @@
 
 ## frontmatter (development version)
 
+- Added SQL front matter support with two comment styles: line comments
+  (`-- ---`/`-- +++`) and block comments in compact (`/* ---` …
+  `--- */`) and expanded (`/*` + `---` … `---` + `*/`) forms. Six new
+  delimiter shortcuts are available for
+  [`write_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/format_front_matter.md):
+  `yaml_sql_line`, `toml_sql_line`, `yaml_sql_block_compact`,
+  `toml_sql_block_compact`, `yaml_sql_block_expanded`, and
+  `toml_sql_block_expanded`
+  ([\#4](https://github.com/posit-dev/frontmatter/issues/4)).
+
 ## frontmatter 0.2.0
+
+CRAN release: 2026-02-09
 
 - New
   [`format_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/format_front_matter.md)

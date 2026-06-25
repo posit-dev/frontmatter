@@ -87,16 +87,22 @@ write_front_matter(
 The `delimiter` argument controls the fence style used to wrap the front
 matter. You can use these built-in shortcuts:
 
-|                  |        |                |          |                                   |
-|------------------|--------|----------------|----------|-----------------------------------|
-| Shortcut         | Format | Opening        | Closing  | Use Case                          |
-| `"yaml"`         | YAML   | `---`          | `---`    | Markdown, R Markdown, Quarto      |
-| `"toml"`         | TOML   | `+++`          | `+++`    | Hugo, some static site generators |
-| `"yaml_comment"` | YAML   | `# ---`        | `# ---`  | R scripts, Python scripts         |
-| `"toml_comment"` | TOML   | `# +++`        | `# +++`  | R scripts, Python scripts         |
-| `"yaml_roxy"`    | YAML   | `#' ---`       | `#' ---` | Roxygen2 documentation            |
-| `"toml_roxy"`    | TOML   | `#' +++`       | `#' +++` | Roxygen2 documentation            |
-| `"toml_pep723"`  | TOML   | `# /// script` | `# ///`  | Python PEP 723 inline metadata    |
+|  |  |  |  |  |
+|----|----|----|----|----|
+| Shortcut | Format | Opening | Closing | Use Case |
+| `"yaml"` | YAML | `---` | `---` | Markdown, R Markdown, Quarto |
+| `"toml"` | TOML | `+++` | `+++` | Hugo, some static site generators |
+| `"yaml_comment"` | YAML | `# ---` | `# ---` | R scripts, Python scripts |
+| `"toml_comment"` | TOML | `# +++` | `# +++` | R scripts, Python scripts |
+| `"yaml_roxy"` | YAML | `#' ---` | `#' ---` | Roxygen2 documentation |
+| `"toml_roxy"` | TOML | `#' +++` | `#' +++` | Roxygen2 documentation |
+| `"toml_pep723"` | TOML | `# /// script` | `# ///` | Python PEP 723 inline metadata |
+| `"yaml_sql_line"` | YAML | `-- ---` | `-- ---` | SQL scripts (line comments) |
+| `"toml_sql_line"` | TOML | `-- +++` | `-- +++` | SQL scripts (line comments) |
+| `"yaml_sql_block_compact"` | YAML | `/* ---` | `--- */` | SQL scripts (block comments) |
+| `"toml_sql_block_compact"` | TOML | `/* +++` | `+++ */` | SQL scripts (block comments) |
+| `"yaml_sql_block_expanded"` | YAML | `/*` + `---` | `---` + `*/` | SQL scripts (block comments) |
+| `"toml_sql_block_expanded"` | TOML | `/*` + `+++` | `+++` + `*/` | SQL scripts (block comments) |
 
 For custom delimiters, pass a character vector of length 1, 2, or 3:
 
@@ -139,10 +145,10 @@ Documents formatted with these functions can be read back with
 [`parse_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/parse_front_matter.md)
 or
 [`read_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/parse_front_matter.md).
-For comment-prefixed formats (like `yaml_comment` or `yaml_roxy`), a
-separator line is automatically inserted between the closing fence and
-the body when the body starts with the same comment prefix, ensuring
-clean roundtrip behavior.
+For comment-prefixed formats (like `yaml_comment`, `yaml_roxy`, or
+`yaml_sql_line`), a separator line is automatically inserted between the
+closing fence and the body when the body starts with the same comment
+prefix, ensuring clean roundtrip behavior.
 
 ## See also
 

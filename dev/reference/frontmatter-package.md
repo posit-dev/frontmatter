@@ -12,6 +12,8 @@ by fences.
 
 - Comment-wrapped formats for R/Python files (`#` and `#'` prefixes)
 
+- SQL comment formats (`--` line comments and `/* */` block comments)
+
 - PEP 723 Python inline script metadata
 
 ## Main Functions
@@ -41,6 +43,11 @@ Useful links:
 
 **Maintainer**: Garrick Aden-Buie <garrick@posit.co>
 ([ORCID](https://orcid.org/0000-0002-7111-0077))
+
+Authors:
+
+- Garrick Aden-Buie <garrick@posit.co>
+  ([ORCID](https://orcid.org/0000-0002-7111-0077))
 
 Other contributors:
 

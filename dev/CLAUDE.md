@@ -20,6 +20,7 @@ after changing roxygen comments - `btw_tool_pkg_check` - Run R CMD check
 Otherwise, use devtools in R:
 
 ``` r
+
 # Run all tests
 devtools::test(reporter = "check")
 # Run specific test file (matches test-{name}.R)
