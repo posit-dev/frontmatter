@@ -1,5 +1,11 @@
 # frontmatter (development version)
 
+* `format_front_matter()` and `write_front_matter()` now infer the delimiter
+  automatically when `delimiter = NULL` (the new default). If `x` was returned
+  by `parse_front_matter()` or `read_front_matter()`, the original fence style
+  is preserved; otherwise `write_front_matter()` falls back to the file
+  extension of `path`, and finally to `"yaml"` (#8).
+
 * Added support for shebang lines (`#!`) at the start of files. When a file
   begins with a shebang, the parser now recognizes front matter in
   comment-wrapped formats (`# ---`, `#' ---`) and PEP 723 (`# /// script`)
