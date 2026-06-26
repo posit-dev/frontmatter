@@ -2,6 +2,19 @@
 
 ## frontmatter (development version)
 
+- [`format_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/format_front_matter.md)
+  and
+  [`write_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/format_front_matter.md)
+  now infer the delimiter automatically when `delimiter = NULL` (the new
+  default). If `x` was returned by
+  [`parse_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/parse_front_matter.md)
+  or
+  [`read_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/parse_front_matter.md),
+  the original fence style is preserved; otherwise
+  [`write_front_matter()`](https://posit-dev.github.io/frontmatter/dev/reference/format_front_matter.md)
+  falls back to the file extension of `path`, and finally to `"yaml"`
+  ([\#8](https://github.com/posit-dev/frontmatter/issues/8)).
+
 - Added support for shebang lines (`#!`) at the start of files. When a
   file begins with a shebang, the parser now recognizes front matter in
   comment-wrapped formats (`# ---`, `#' ---`) and PEP 723
